@@ -1,0 +1,59 @@
+﻿@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model LoginOrRegisterViewModel
+
+@{
+    ViewData["Title"] = "LogIn";
+}
+
+<section class="auth-form">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center justify-content-center">
+            <div class="col-12">
+                <div class="login-page">
+                    <div class="form">
+                        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "register-form" }))
+                        {
+                            <input type="text" name="Name" placeholder="name" />
+                            <span asp-validation-for="Register.Name" class="text-danger"></span>
+                            <input type="text" name="Email" placeholder="email" />
+                            <span asp-validation-for="Register.Email" class="text-danger"></span>
+                            <input type="password" name="Password" placeholder="password" />
+                            <span asp-validation-for="Register.Password" class="text-danger"></span>
+                            <input type="password" name="ConfirmPassword" placeholder="confirm password" />
+                            <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
+                            <button type="submit">create</button>
+                            <p class="message">Already registered? <a href="#">Sign In</a></p>
+                        }
+
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
+                        {
+                            <input type="text" name="Email" placeholder="email" />
+                            <span asp-validation-for="Login.Email" class="text-danger"></span>
+                            <input type="password" name="Password" placeholder="password" />
+                            <span asp-validation-for="Login.Password" class="text-danger"></span>
+                            @Html.CheckBox("RememberMe", false)
+                            @Html.DisplayNameFor(m => m.Login.RememberMe)
+
+                            <button type="submit">login</button>
+                            <p class="message">Not registered? <a href="#">Create an account</a></p>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $('.message a').click(function () {
+            $('form').animate({ height: "toggle", opacity: "toggle" }, "slow");
+        });
+    </script>
+}
