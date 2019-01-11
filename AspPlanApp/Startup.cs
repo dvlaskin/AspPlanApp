@@ -22,6 +22,7 @@ namespace AspPlanApp
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
         }
 
         public IConfiguration Configuration { get; }
@@ -29,10 +30,20 @@ namespace AspPlanApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AppDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDbContext<AppDbContext>(options => 
+            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
+            services.AddEntityFrameworkSqlite().AddDbContext<AppDbContext>(option => 
+            option.UseSqlite(Configuration.GetConnectionString("SqliteConnection")));
+
+
+            services.AddIdentity<User, IdentityRole>( opts => {
+                opts.Password.RequiredLength = 5;   
+                opts.Password.RequireNonAlphanumeric = false;   
+                opts.Password.RequireLowercase = false; 
+                opts.Password.RequireUppercase = false; 
+                opts.Password.RequireDigit = false; 
+            })
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddTransient<IEmailSender, EmailSender>();

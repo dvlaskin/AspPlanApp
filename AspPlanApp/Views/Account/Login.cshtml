@@ -16,6 +16,7 @@
                     <div class="form">
                         @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "register-form" }))
                         {
+                            <div asp-validation-summary="All" class="text-danger"></div>
                             <input type="text" name="Name" placeholder="name" />
                             <span asp-validation-for="Register.Name" class="text-danger"></span>
                             <input type="text" name="Email" placeholder="email" />
@@ -30,6 +31,7 @@
 
                         @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login-form" }))
                         {
+                            <div asp-validation-summary="All" class="text-danger"></div>
                             <input type="text" name="Email" placeholder="email" />
                             <span asp-validation-for="Login.Email" class="text-danger"></span>
                             <input type="password" name="Password" placeholder="password" />
