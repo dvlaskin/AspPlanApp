@@ -4,11 +4,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspPlanApp.Models.AccountViewModels;
+using AspPlanApp.Models.DbModels;
 using AspPlanApp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,13 +24,20 @@ namespace AspPlanApp.Controllers
     {
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
         public AccountController(
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            UserManager<User> userManager, 
+            SignInManager<User> signInManager
+        )
         {
             _emailSender = emailSender;
             _logger = logger;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [TempData]
@@ -70,7 +79,29 @@ namespace AspPlanApp.Controllers
 
             if (ModelState.IsValid)
             {
+                User user = new User()
+                {
+                    UserName = model.Name,
+                    Email = model.Email,
+                    
+                };
 
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    // user is registered
+                    await _signInManager.SignInAsync(user, false);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    // was some errors which return to form
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
             else
             {
