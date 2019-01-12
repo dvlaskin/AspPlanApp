@@ -34,7 +34,7 @@ namespace AspPlanApp
             //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddEntityFrameworkSqlite().AddDbContext<AppDbContext>(option => 
-            option.UseSqlite(Configuration.GetConnectionString("SqliteConnection")));
+                option.UseSqlite(Configuration.GetConnectionString("SqliteConnection")));
 
 
             services.AddIdentity<User, IdentityRole>( opts => {

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.PathSegments;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -60,7 +61,24 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                return View(model);
+                var user = _userManager.FindByEmailAsync(model.Email).Result;
+
+                if (user != null)
+                {
+                    var resultLogIn =
+                        await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, false);
+
+                    if (resultLogIn.Succeeded)
+                    {
+                        _logger.LogInformation($"User {model.Email} is loginIn.");
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            
+                ModelState.AddModelError("", "Wrong Login and(or) password!");
+                return View(new LoginOrRegisterViewModel());
+                
+                
             }
             else
             {
@@ -69,6 +87,15 @@ namespace AspPlanApp.Controllers
 
             // If we got this far, something failed, redisplay form
             //return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         [HttpPost]
@@ -91,6 +118,7 @@ namespace AspPlanApp.Controllers
                 {
                     // user is registered
                     await _signInManager.SignInAsync(user, false);
+                    _logger.LogInformation($"User {user.Email} is registered.");
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -99,6 +127,7 @@ namespace AspPlanApp.Controllers
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
+                        _logger.LogInformation($"User {user.Email} registering error\r\n{error.Description}.");
                     }
                 }
             }

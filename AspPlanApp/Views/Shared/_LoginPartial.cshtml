@@ -1,8 +1,11 @@
 @using Microsoft.AspNetCore.Identity
 @using AspPlanApp.Models
+@using AspPlanApp.Models.DbModels
 
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
-@*@if (SignInManager.IsSignedIn(User))
+@if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userParams" role="button"
@@ -22,8 +25,5 @@
         <li class="nav-item">
             <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Log in</a>
         </li>
-    }*@
+    }
 
-<li class="nav-item">
-    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Log in</a>
-</li>
