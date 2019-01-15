@@ -134,6 +134,10 @@ li {
     .button-main:hover,.button-main:active,.button-main:focus {
         background: #FF6E40;
     }
+    
+.viewRenderBody{
+    margin-top: 80px;
+}
 
 /* Header & Menu Area CSS */
 

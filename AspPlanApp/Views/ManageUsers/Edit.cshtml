@@ -1,0 +1,42 @@
+﻿@model AspPlanApp.Models.ManageUsersViewModels.EditUserViewModel
+
+@{
+    ViewBag.Title = "Edit User Info";
+    Layout = "_Layout";
+}
+<div class="container">
+    <div class="col-md-4 offset-md-4 col-sm-10 offset-sm-1">
+        <form asp-action="Edit" asp-controller="ManageUsers">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div>
+                <input type="hidden" asp-for="Id"/>
+            </div>
+            <div>
+                <label asp-for="Name" class="control-label">User Name</label>
+                <input type="text" asp-for="Name" class="form-control"/>
+            </div>
+            <div>
+                <label asp-for="Email" class="control-label">Email</label>
+                <input type="email" asp-for="Email" class="form-control"/>
+            </div>
+            <div>
+                <label asp-for="OldPassword" class="control-label">Old Password</label>
+                <input type="password" asp-for="OldPassword" class="form-control"/>
+            </div>
+            <div>
+                <label asp-for="NewPassword" class="control-label">New Password</label>
+                <input type="password" asp-for="NewPassword" class="form-control"/>
+            </div>
+            <div>
+                <label asp-for="ConfirmNewPassword" class="control-label">Confirm Password</label>
+                <input type="password" asp-for="ConfirmNewPassword" class="form-control"/>
+            </div>
+            <div class="offset-4 col-4">
+                <input type="submit" value="Save" class="btn btn-primary"/>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+

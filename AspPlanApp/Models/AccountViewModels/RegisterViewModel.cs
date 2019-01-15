@@ -10,6 +10,8 @@ namespace AspPlanApp.Models.AccountViewModels
     {
         [Required]
         [Display(Name = "Name")]
+        [MinLength(3, ErrorMessage = "The Name must be at least 3 and at max 25 characters long.")]
+        [MaxLength(25, ErrorMessage = "The Name must be at least 3 and at max 25 characters long.")]
         public string Name { get; set; }
 
         [Required]
