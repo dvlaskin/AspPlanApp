@@ -134,10 +134,15 @@ li {
     .button-main:hover,.button-main:active,.button-main:focus {
         background: #FF6E40;
     }
-    
-.viewRenderBody{
-    margin-top: 80px;
+
+.viewRenderBody {
+
 }
+
+.top-conteiner {
+    padding-top: 80px;
+}
+
 
 /* Header & Menu Area CSS */
 
@@ -346,7 +351,7 @@ li {
   position: relative;
   z-index: 1;
   background: #FFFFFF;
-  max-width: 360px;
+  /*max-width: 360px;*/
   margin: 0 auto 100px;
   padding: 45px;
   text-align: center;
