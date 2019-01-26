@@ -7,6 +7,6 @@ namespace AspPlanApp.Models.DbModels
     /// </summary>
     public class User : IdentityUser
     {
-        
+        public int CompId { get; set; }
     }
 }

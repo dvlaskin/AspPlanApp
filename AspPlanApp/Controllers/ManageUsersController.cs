@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AspPlanApp.Models;
 using AspPlanApp.Models.DbModels;
 using AspPlanApp.Models.ManageUsersViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -13,18 +14,36 @@ namespace AspPlanApp.Controllers
     public class ManageUsersController : Controller
     {
         private UserManager<User> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
 
-        public ManageUsersController(UserManager<User> userManager)
+        public ManageUsersController(UserManager<User> userManager, RoleManager<IdentityRole> roleManger)
         {
             _userManager = userManager;
+            _roleManager = roleManger;
         }
         
         
         [HttpGet]
         public IActionResult Index()
         {
+            var user = User;
+
+            /* todo: закончить роутинг корректировки пользователей
+              в зависимости от роли 
+              - для админа все
+              - для владельца - персонал
+              - для персонала и пользователей - сразу ред. свои данные
+             */
             
-            return View(_userManager.Users.ToList());
+            if (user.IsInRole(AppRoles.Admin))
+            {
+                return View(_userManager.Users.ToList());
+            }
+            else
+            {
+                return RedirectToAction("Edit", "ManageUsers", new { id = _userManager.GetUserId(user)});
+            }
+            
         }
         
         [HttpGet]

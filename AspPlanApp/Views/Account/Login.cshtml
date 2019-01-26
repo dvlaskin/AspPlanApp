@@ -2,6 +2,7 @@
 @using System.Linq
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
+@using Microsoft.AspNetCore.Identity
 @model LoginOrRegisterViewModel
 
 @{
@@ -19,6 +20,18 @@
                             <div asp-validation-summary="All" class="text-danger"></div>
                             <input type="text" name="Name" placeholder="name" />
                             <span asp-validation-for="Register.Name" class="text-danger"></span>
+                            <select name="Role">
+                                <option value="" disabled selected>Select your Role</option>
+                                @foreach (IdentityRole role in ViewBag.Roles)
+                                {
+                                     if (role.Name != "admin")
+                                     {
+                                         <option value="@role.Name">@role.Name</option>
+                                     }
+                                        
+                                }
+                            </select>
+                            <span asp-validation-for="Register.Role" class="text-danger"></span>
                             <input type="text" name="Email" placeholder="email" />
                             <span asp-validation-for="Register.Email" class="text-danger"></span>
                             <input type="password" name="Password" placeholder="password" />

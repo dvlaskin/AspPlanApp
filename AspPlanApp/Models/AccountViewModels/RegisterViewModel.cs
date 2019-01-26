@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace AspPlanApp.Models.AccountViewModels
 {
@@ -13,6 +14,10 @@ namespace AspPlanApp.Models.AccountViewModels
         [MinLength(3, ErrorMessage = "The Name must be at least 3 and at max 25 characters long.")]
         [MaxLength(25, ErrorMessage = "The Name must be at least 3 and at max 25 characters long.")]
         public string Name { get; set; }
+        
+        [Required]
+        [Display(Name = "Role")]
+        public string Role { get; set; } 
 
         [Required]
         [EmailAddress]

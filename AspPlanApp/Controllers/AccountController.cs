@@ -27,18 +27,21 @@ namespace AspPlanApp.Controllers
         private readonly ILogger _logger;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(
             IEmailSender emailSender,
             ILogger<AccountController> logger,
             UserManager<User> userManager, 
-            SignInManager<User> signInManager
+            SignInManager<User> signInManager,
+            RoleManager<IdentityRole> roleManager
         )
         {
             _emailSender = emailSender;
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         [TempData]
@@ -51,6 +54,8 @@ namespace AspPlanApp.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
+            ViewBag.Roles = _roleManager.Roles;
+            
             return View(new LoginOrRegisterViewModel());
         }
 
@@ -117,6 +122,7 @@ namespace AspPlanApp.Controllers
                 if (result.Succeeded)
                 {
                     // user is registered
+                    await _userManager.AddToRoleAsync(user, model.Role);
                     await _signInManager.SignInAsync(user, false);
                     _logger.LogInformation($"User {user.Email} is registered.");
                     return RedirectToAction("Index", "Home");

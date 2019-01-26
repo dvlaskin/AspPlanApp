@@ -14,6 +14,8 @@ namespace AspPlanApp.Models
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<DbModels.Org> Orgs { get; set; }
+        public DbSet<DbModels.OrgStaff> OrgStaff { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -28,6 +30,8 @@ namespace AspPlanApp.Models
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogin"); 
             builder.Entity<IdentityUserToken<string>>().ToTable("UserToken"); 
             builder.Entity<IdentityRoleClaim<string>>().ToTable("UserRoleClaim");
+
+            builder.Entity<DbModels.Org>().HasKey(k => k.orgId);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace AspPlanApp
                 {
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    RoleInit.RoleInitAsync(userManager, rolesManager);
+                    DbDefaultValuesInit.DbInitAsync(userManager, rolesManager);
                 }
                 catch (Exception ex)
                 {
