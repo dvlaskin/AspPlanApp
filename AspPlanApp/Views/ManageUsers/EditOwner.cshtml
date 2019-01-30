@@ -1,0 +1,57 @@
+﻿@model AspPlanApp.Models.ManageUsersViewModels.EditOwnerViewModel
+
+@{
+    ViewBag.Title = "Edit Owner Info";
+    Layout = "_Layout";
+}
+
+
+
+<div class="auth-form">
+    <div class="container-fluid h-100">
+        <div class="row h-100 align-items-center justify-content-center">
+            <div class="form row col-12">
+               
+                <div class="col-2">
+                    left side
+                </div>
+                <div class="col-10">
+                    <form asp-action="EditOwner" asp-controller="ManageUsers">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div>
+                            <input type="hidden" asp-for="Id"/>
+                        </div>
+                        <div>
+                            <label asp-for="Name" class="control-label">User Name</label>
+                            <input type="text" asp-for="Name" class="form-control"/>
+                        </div>
+                        <div>
+                            <label asp-for="Email" class="control-label">Email</label>
+                            <input type="email" asp-for="Email" class="form-control"/>
+                        </div>
+                        <div>
+                            <label asp-for="OldPassword" class="control-label">Old Password</label>
+                            <input type="password" asp-for="OldPassword" class="form-control"/>
+                        </div>
+                        <div>
+                            <label asp-for="NewPassword" class="control-label">New Password</label>
+                            <input type="password" asp-for="NewPassword" class="form-control"/>
+                        </div>
+                        <div>
+                            <label asp-for="ConfirmNewPassword" class="control-label">Confirm Password</label>
+                            <input type="password" asp-for="ConfirmNewPassword" class="form-control"/>
+                        </div>
+
+                        <button type="submit">Save</button>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

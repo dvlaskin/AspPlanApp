@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AspPlanApp.Models;
 using AspPlanApp.Models.DbModels;
 using AspPlanApp.Models.ManageUsersViewModels;
+using AspPlanApp.Services.DbHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Controllers
 {
@@ -15,11 +19,21 @@ namespace AspPlanApp.Controllers
     {
         private UserManager<User> _userManager;
         private RoleManager<IdentityRole> _roleManager;
+        private AppDbContext _dbContext;
+        private IConfiguration _config;
 
-        public ManageUsersController(UserManager<User> userManager, RoleManager<IdentityRole> roleManger)
+        public ManageUsersController(
+            UserManager<User> userManager, 
+            RoleManager<IdentityRole> roleManger,
+            AppDbContext dbContext,
+            IConfiguration config
+            
+        )
         {
             _userManager = userManager;
             _roleManager = roleManger;
+            _dbContext = dbContext;
+            _config = config;
         }
         
         
@@ -27,6 +41,8 @@ namespace AspPlanApp.Controllers
         public IActionResult Index()
         {
             var user = User;
+
+            string userId = _userManager.GetUserId(user);
 
             /* todo: закончить роутинг корректировки пользователей
               в зависимости от роли 
@@ -39,15 +55,36 @@ namespace AspPlanApp.Controllers
             {
                 return View(_userManager.Users.ToList());
             }
+            else if (user.IsInRole(AppRoles.Owner))
+            {
+                return RedirectToAction("EditOwner", "ManageUsers", new {id = userId});
+            }
             else
             {
-                return RedirectToAction("Edit", "ManageUsers", new { id = _userManager.GetUserId(user)});
+                return RedirectToAction("EditClient", "ManageUsers", new { id = userId});
             }
             
         }
+
+        [HttpGet]
+        public async Task<IActionResult> EditOwner(string id)
+        {
+            User owner = await _userManager.FindByIdAsync(id);
+
+            if (owner == null)
+            {
+                return NotFound();
+            }
+
+            var dbServ = new ManageUsersServ(_dbContext, _config);
+
+            EditOwnerViewModel viewModel = await dbServ.GetOwnerInfoAcync(owner);
+            
+            return View(viewModel);
+        }
         
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> EditClient(string id)
         {
             User user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -55,7 +92,7 @@ namespace AspPlanApp.Controllers
                 return NotFound();
             }
             
-            EditUserViewModel model = new EditUserViewModel
+            EditClientViewModel model = new EditClientViewModel
             {
                 Id = user.Id, 
                 Name = user.UserName,
@@ -68,7 +105,7 @@ namespace AspPlanApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EditUserViewModel model)
+        public async Task<IActionResult> EditClient(EditClientViewModel model)
         {
             if (ModelState.IsValid)
             {

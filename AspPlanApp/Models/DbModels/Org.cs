@@ -1,8 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Identity;
-
-namespace AspPlanApp.Models.DbModels
+﻿namespace AspPlanApp.Models.DbModels
 {
     /// <summary>
     /// Organization Model

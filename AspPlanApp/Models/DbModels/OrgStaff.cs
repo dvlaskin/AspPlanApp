@@ -7,6 +7,7 @@
     {
         public int orgStaffId { get; set; }
         public int orgId { get; set; }
-        public int staffId { get; set; }
+        public string staffId { get; set; }
+        public bool isConfirm { get; set; }
     }
 }

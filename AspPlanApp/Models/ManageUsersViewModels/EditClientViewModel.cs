@@ -2,7 +2,7 @@
 
 namespace AspPlanApp.Models.ManageUsersViewModels
 {
-    public class EditUserViewModel
+    public class EditClientViewModel
     {
         
         public string Id { get; set; }

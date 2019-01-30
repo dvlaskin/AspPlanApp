@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Models
 {
@@ -13,8 +14,8 @@ namespace AspPlanApp.Models
             Database.EnsureCreated();
         }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<DbModels.Org> Orgs { get; set; }
+        public DbSet<DbModels.User> User { get; set; }
+        public DbSet<DbModels.Org> Org { get; set; }
         public DbSet<DbModels.OrgStaff> OrgStaff { get; set; }
 
 

@@ -81,6 +81,7 @@ namespace AspPlanApp.Controllers
                 }
             
                 ModelState.AddModelError("", "Wrong Login and(or) password!");
+                ViewBag.Roles = _roleManager.Roles;
                 return View(new LoginOrRegisterViewModel());
                 
                 
