@@ -82,7 +82,7 @@ namespace AspPlanApp.Controllers
             
             return View(viewModel);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> EditClient(string id)
         {

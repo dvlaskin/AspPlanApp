@@ -6,17 +6,18 @@
 }
 
 
-
-<div class="auth-form">
-    <div class="container-fluid h-100">
-        <div class="row h-100 align-items-center justify-content-center">
-            <div class="form row col-12">
+<div class="container-fluid h-100">
+    <div class="h-100 align-items-center justify-content-center">
+        <div class="form header-margin">          
+            
+            <h3>Manage Owner</h3>
+          
+            <form asp-action="EditOwner" asp-controller="ManageUsers">
                
-                <div class="col-2">
-                    left side
-                </div>
-                <div class="col-10">
-                    <form asp-action="EditOwner" asp-controller="ManageUsers">
+                <div class="col-sm-12 col-md-6 offset-md-3">
+                    <a class="ul-sub-level" href="#">User Info</a>
+                    <br/>
+                    <div class="data-edit hide">
                         <div asp-validation-summary="All" class="text-danger"></div>
                         <div>
                             <input type="hidden" asp-for="Id"/>
@@ -43,15 +44,76 @@
                         </div>
 
                         <button type="submit">Save</button>
-
-                    </form>
+                        
+                    </div>
+                    <hr/>
                 </div>
+                    
+                @foreach (var org in Model.Orgs)
+                {
+                    <div class="col-sm-12 col-md-6 offset-md-3">
+                        <a class="ul-sub-level" href="#">@org.orgName</a>
+                        <p>@org.city</p>
+                        <br/>
+                        <div class="data-edit hide">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                            <div>
+                                <input type="hidden" asp-for="@org.orgId"/>
+                            </div>
+                            <div>
+                                <label asp-for="@org.orgName" class="control-label">Company</label>
+                                <input type="text" asp-for="@org.orgName" class="form-control"/>
+                            </div>
+                            <div>
+                                <label asp-for="@org.address" class="control-label">Address</label>
+                                <input type="text" asp-for="@org.address" class="form-control"/>
+                            </div>
+                            <div>
+                                <label asp-for="@org.city" class="control-label">City</label>
+                                <input type="text" asp-for="@org.city" class="form-control"/>
+                            </div>
+                            <div>
+                                <label asp-for="@org.country" class="control-label">Country</label>
+                                <input type="text" asp-for="@org.country" class="form-control"/>
+                            </div>
+                            <div>
+                                <label asp-for="@org.phoneNumber" class="control-label">Phone</label>
+                                <input type="tel" asp-for="@org.phoneNumber" class="form-control"/>
+                            </div>
 
-            </div>
+                            <button type="submit">Save</button>                          
+                           
+                        </div>
+                        <hr/>
+                    </div>                     
+
+                }
+            </form>
+            
         </div>
     </div>
 </div>
 
 
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+
+        $(document).on('click', '.ul-sub-level', function() {
+
+            var editDiv = $(this).closest('div').find('.data-edit');
+            
+            if (editDiv.hasClass('hide')) {
+                editDiv.removeClass('hide');
+            } 
+            else {
+                editDiv.addClass('hide');
+            }              
+            
+        });
+        
+    </script>
+}
 
 
