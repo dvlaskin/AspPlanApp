@@ -11,7 +11,7 @@
         <div class="form header-margin">          
             
             <h3>Manage Owner</h3>
-          
+            <hr/>
             <form asp-action="EditOwner" asp-controller="ManageUsers">
                
                 <div class="col-sm-12 col-md-6 offset-md-3">
@@ -43,50 +43,51 @@
                             <input type="password" asp-for="ConfirmNewPassword" class="form-control"/>
                         </div>
 
-                        <button type="submit">Save</button>
+                        <button type="submit">Save All</button>
                         
                     </div>
                     <hr/>
                 </div>
                     
-                @foreach (var org in Model.Orgs)
+                
+                @for (int i = 0; i < Model.Orgs.Count(); i++)
                 {
                     <div class="col-sm-12 col-md-6 offset-md-3">
-                        <a class="ul-sub-level" href="#">@org.orgName</a>
-                        <p>@org.city</p>
+                        <a class="ul-sub-level" href="#">@Model.Orgs[i].orgName</a>
+                        <p>@Model.Orgs[i].city</p>
                         <br/>
                         <div class="data-edit hide">
                             <div asp-validation-summary="All" class="text-danger"></div>
                             <div>
-                                <input type="hidden" asp-for="@org.orgId"/>
+                                <input type="hidden" asp-for="@Model.Orgs[i].orgId"/>
+               
                             </div>
                             <div>
-                                <label asp-for="@org.orgName" class="control-label">Company</label>
-                                <input type="text" asp-for="@org.orgName" class="form-control"/>
+                                <label asp-for="@Model.Orgs[i].orgName" class="control-label">Company</label>
+                                <input type="text" asp-for="@Model.Orgs[i].orgName" class="form-control"/>
                             </div>
                             <div>
-                                <label asp-for="@org.address" class="control-label">Address</label>
-                                <input type="text" asp-for="@org.address" class="form-control"/>
+                                <label asp-for="@Model.Orgs[i].address" class="control-label">Address</label>
+                                <input type="text" asp-for="@Model.Orgs[i].address" class="form-control"/>
                             </div>
                             <div>
-                                <label asp-for="@org.city" class="control-label">City</label>
-                                <input type="text" asp-for="@org.city" class="form-control"/>
+                                <label asp-for="@Model.Orgs[i].city" class="control-label">City</label>
+                                <input type="text" asp-for="@Model.Orgs[i].city" class="form-control"/>
                             </div>
                             <div>
-                                <label asp-for="@org.country" class="control-label">Country</label>
-                                <input type="text" asp-for="@org.country" class="form-control"/>
+                                <label asp-for="@Model.Orgs[i].country" class="control-label">Country</label>
+                                <input type="text" asp-for="@Model.Orgs[i].country" class="form-control"/>
                             </div>
                             <div>
-                                <label asp-for="@org.phoneNumber" class="control-label">Phone</label>
-                                <input type="tel" asp-for="@org.phoneNumber" class="form-control"/>
+                                <label asp-for="@Model.Orgs.[i].phoneNumber" class="control-label">Phone</label>
+                                <input type="tel" asp-for="@Model.Orgs[i].phoneNumber" class="form-control"/>
                             </div>
 
-                            <button type="submit">Save</button>                          
+                            <button type="submit">Save All</button>                          
                            
                         </div>
                         <hr/>
                     </div>                     
-
                 }
             </form>
             
@@ -100,7 +101,9 @@
 
     <script>
 
-        $(document).on('click', '.ul-sub-level', function() {
+        $(document).on('click', '.ul-sub-level', function(e) {
+            
+            e.preventDefault();
 
             var editDiv = $(this).closest('div').find('.data-edit');
             

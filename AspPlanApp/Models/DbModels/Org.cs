@@ -1,9 +1,21 @@
 ﻿namespace AspPlanApp.Models.DbModels
 {
+
+    public interface IEditOrg
+    {
+        int orgId { get; set; }
+        string orgName { get; set; }
+        string owner { get; set; }
+        string address { get; set; }
+        string city { get; set; }
+        string country { get; set; }
+        string phoneNumber { get; set; }
+    }
+    
     /// <summary>
     /// Organization Model
     /// </summary>
-    public class Org
+    public class Org : IEditOrg
     {
         
         public int orgId { get; set; }

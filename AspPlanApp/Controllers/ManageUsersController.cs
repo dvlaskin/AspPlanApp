@@ -9,6 +9,7 @@ using AspPlanApp.Services.DbHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Configuration;
 
@@ -21,6 +22,8 @@ namespace AspPlanApp.Controllers
         private RoleManager<IdentityRole> _roleManager;
         private AppDbContext _dbContext;
         private IConfiguration _config;
+        private ManageUsersServ _userSrv;
+        private ManageOrgServ _orgServ;
 
         public ManageUsersController(
             UserManager<User> userManager, 
@@ -57,7 +60,7 @@ namespace AspPlanApp.Controllers
             }
             else if (user.IsInRole(AppRoles.Owner))
             {
-                return RedirectToAction("EditOwner", "ManageUsers", new {id = userId});
+                return RedirectToAction(nameof(EditOwner), "ManageUsers", new {id = userId});
             }
             else
             {
@@ -75,12 +78,50 @@ namespace AspPlanApp.Controllers
             {
                 return NotFound();
             }
-
-            var dbServ = new ManageUsersServ(_dbContext, _config);
-
-            EditOwnerViewModel viewModel = await dbServ.GetOwnerInfoAcync(owner);
+           
+            var userSrv = new ManageUsersServ(_dbContext, _config, _userManager, _roleManager);
             
+            EditOwnerViewModel viewModel = await userSrv.GetOwnerInfoAcync(owner);                                                
+           
             return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditOwner(EditOwnerViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userSrv = GetUsersServ();
+                var updClientResult = await userSrv.ClientUpdate(model);
+
+                if (!updClientResult.isSuccess)
+                {
+                    foreach (var err in updClientResult.errors)
+                    {
+                        ModelState.AddModelError(string.Empty, err);
+                    }
+                    
+                    return View();
+                }
+
+                var orgSrv = GetOrgServ();
+                foreach (var orgItem in model.Orgs)
+                {
+                    var updOrgResult = await orgSrv.OrgUpdate(orgItem);
+                    if (!updOrgResult.isSuccess)
+                    {
+                        foreach (var err in updOrgResult.errors)
+                        {
+                            ModelState.AddModelError(string.Empty, err);
+                        }
+                        
+                        return View();
+                    }
+                }
+                
+            }
+            
+            return RedirectToAction(nameof(EditOwner), "ManageUsers", new { id = model.Id });
         }
 
         [HttpGet]
@@ -109,56 +150,20 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.FindByIdAsync(model.Id);
+                var userSrv = GetUsersServ();
+                var updClientResult = await userSrv.ClientUpdate(model);
 
-                if (user != null)
+                if (!updClientResult.isSuccess)
                 {
-                    user.Email = model.Email;
-                    user.UserName = model.Name;
-                    
-                    IdentityResult result = await _userManager.UpdateAsync(user);
-                    if (!result.Succeeded)
+                    foreach (var err in updClientResult.errors)
                     {
-                        foreach (var error in result.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
-
-                        return View();
-                    }
-
-                    if (
-                        !string.IsNullOrEmpty(model.OldPassword) &&
-                        !string.IsNullOrEmpty(model.NewPassword) &&
-                        !string.IsNullOrEmpty(model.ConfirmNewPassword)
-                    )
-                    {
-                        bool checkPassResult = await _userManager.CheckPasswordAsync(user, model.OldPassword);
-
-                        if (checkPassResult)
-                        {
-                            IdentityResult changePassResult =
-                                await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-
-                            if (!changePassResult.Succeeded)
-                            {
-                                foreach (var error in result.Errors)
-                                {
-                                    ModelState.AddModelError(string.Empty, error.Description);
-                                }
-
-                                return View();
-                            }
-                        }
-                        else
-                        {
-                            ModelState.AddModelError(string.Empty, "Password was not changed.");
-                            return View();
-                        }
+                        ModelState.AddModelError(string.Empty, err);
                     }
                     
-                    return RedirectToAction("Index");
-                }
+                    return View();
+                }              
+                
+                return RedirectToAction("Index");
             }
             
             return View();
@@ -171,8 +176,28 @@ namespace AspPlanApp.Controllers
             if (user != null)
             {
                 IdentityResult result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    ModelState.AddModelError(string.Empty, result.Errors.ToString());
+                }
             }
+            
             return RedirectToAction("Index");
+        }
+
+
+        private ManageUsersServ GetUsersServ()
+        {
+            if (_userSrv == null)
+                _userSrv = new ManageUsersServ(_dbContext, _config, _userManager, _roleManager);
+            return _userSrv;
+        }
+
+        private ManageOrgServ GetOrgServ()
+        {
+            if (_orgServ == null)
+                _orgServ = new ManageOrgServ(_dbContext, _config, _userManager, _roleManager);
+            return _orgServ;
         }
     }
 }

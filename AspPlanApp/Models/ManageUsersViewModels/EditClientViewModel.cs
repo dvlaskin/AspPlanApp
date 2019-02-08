@@ -2,7 +2,17 @@
 
 namespace AspPlanApp.Models.ManageUsersViewModels
 {
-    public class EditClientViewModel
+    public interface IEditClient
+    {
+        string Id { get; set; }
+        string Name { get; set; }
+        string Email { get; set; }
+        string OldPassword { get; set; }
+        string NewPassword { get; set; }
+        string ConfirmNewPassword { get; set; }
+    }
+    
+    public class EditClientViewModel : IEditClient
     {
         
         public string Id { get; set; }

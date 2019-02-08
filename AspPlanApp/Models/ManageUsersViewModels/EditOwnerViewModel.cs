@@ -3,10 +3,17 @@ using AspPlanApp.Models.DbModels;
 
 namespace AspPlanApp.Models.ManageUsersViewModels
 {
+    public interface IEditOwner : IEditClient
+    {
+        IEnumerable<DbModels.Org> Orgs { get; set; } 
+        
+        IEnumerable<OwnerOrgStaffViewModel> Staff { get; set; }
+    }
+    
     public class EditOwnerViewModel : EditClientViewModel
     {
-        public IEnumerable<DbModels.Org> Orgs { get; set; } 
+        public List<DbModels.Org> Orgs { get; set; } 
         
-        public IEnumerable<OwnerOrgStaffViewModel> Staff { get; set; }
+        public List<OwnerOrgStaffViewModel> Staff { get; set; }
     }
 }
