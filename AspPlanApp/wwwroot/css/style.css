@@ -169,6 +169,41 @@ li {
     }
 
 
+.list-card-item {
+    top: 0;
+    left: 0;
+    height: calc(2.25rem + 2px);
+    margin: 10px 0;
+    width: 100%;
+}
+
+.list-card-item .list-card-content {
+    border: 0px solid rgba(123, 123, 123, 0.498039);
+    border-radius: 7px;
+    color: rgb(153, 153, 153);
+    font-size: inherit;
+    height: inherit;
+    font-weight: 400;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0,0,0,0.2) 0px 1px 2px 1px;
+    transition-duration: 500ms;
+}
+    
+    .list-card-item .list-card-content:hover {
+        box-shadow: rgba(0,0,0,0.2) 0px 3px 10px 3px;
+        transition-duration: 500ms;
+    }
+    
+    .list-card-item i {
+        margin: 10px;
+    }
+
+    .list-card-item i:hover {
+        transition-duration: 300ms;
+        transform: scale(1.2);
+    }
+
+
 /* Menu left side style */
 
 .ul-sub-level {

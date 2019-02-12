@@ -24,6 +24,7 @@ namespace AspPlanApp.Controllers
         private IConfiguration _config;
         private ManageUsersServ _userSrv;
         private ManageOrgServ _orgServ;
+        private ManageOrgStaffServ _orgStaffServ;
 
         public ManageUsersController(
             UserManager<User> userManager, 
@@ -185,6 +186,16 @@ namespace AspPlanApp.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public async Task<JsonResult> RemoveStaff(int orgId, string staffId)
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+            var orgStaffServ = GetOrgStaffServ();
+            bool removeResult = await orgStaffServ.RemoveStaffFromOrg(userId, orgId, staffId);
+            return Json (new { result = removeResult });
+        }
+
 
         private ManageUsersServ GetUsersServ()
         {
@@ -198,6 +209,13 @@ namespace AspPlanApp.Controllers
             if (_orgServ == null)
                 _orgServ = new ManageOrgServ(_dbContext, _config, _userManager, _roleManager);
             return _orgServ;
+        }
+        
+        private ManageOrgStaffServ GetOrgStaffServ()
+        {
+            if (_orgStaffServ == null)
+                _orgStaffServ = new ManageOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
+            return _orgStaffServ;
         }
     }
 }

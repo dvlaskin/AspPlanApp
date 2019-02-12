@@ -1,4 +1,6 @@
-﻿@model AspPlanApp.Models.ManageUsersViewModels.EditOwnerViewModel
+﻿@using AspPlanApp.Controllers
+@using Microsoft.AspNetCore.Rewrite.Internal
+@model AspPlanApp.Models.ManageUsersViewModels.EditOwnerViewModel
 
 @{
     ViewBag.Title = "Edit Owner Info";
@@ -11,7 +13,7 @@
         <div class="form header-margin">          
             
             <h3>Manage Owner</h3>
-            <hr/>
+            
             <form asp-action="EditOwner" asp-controller="ManageUsers">
                
                 <div class="col-sm-12 col-md-6 offset-md-3">
@@ -46,7 +48,7 @@
                         <button type="submit">Save All</button>
                         
                     </div>
-                    <hr/>
+                    
                 </div>
                     
                 
@@ -82,11 +84,42 @@
                                 <label asp-for="@Model.Orgs.[i].phoneNumber" class="control-label">Phone</label>
                                 <input type="tel" asp-for="@Model.Orgs[i].phoneNumber" class="form-control"/>
                             </div>
-
-                            <button type="submit">Save All</button>                          
+                            
+                            <div>
+                                <a class="ul-sub-level" href="#">Staff List</a>
+                                <div class="data-edit hide">
+                                    @foreach (var staff in Model.Staff.Where(w => w.orgId == Model.Orgs[i].orgId))
+                                    {
+                                        <div class="list-card-item">
+                                            <div class="list-card-content row">
+                                                <div class="col-8" style="margin: auto;">@staff.userName</div>
+                                                <div>
+                                                    @if (!@staff.isConfirm)
+                                                    {
+                                                        <a href="#" title="Confirm new staff">
+                                                            <i class="fas fa-user-check" style="color: green;"></i>
+                                                        </a>
+                                                    }
+                                                    <a href="#" title="Remove staff from Company">
+                                                        <i class="fas fa-user-times" 
+                                                           id="js-RemoveStaff"
+                                                           orgId="@staff.orgId"
+                                                           staffId="@staff.staffId" 
+                                                           style="color: red;"></i>
+                                                    </a>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <button type="submit">Save All</button>   
+                          
                            
                         </div>
-                        <hr/>
+                        
                     </div>                     
                 }
             </form>
@@ -105,7 +138,7 @@
             
             e.preventDefault();
 
-            var editDiv = $(this).closest('div').find('.data-edit');
+            var editDiv = $(this).closest('div').find('.data-edit').first();
             
             if (editDiv.hasClass('hide')) {
                 editDiv.removeClass('hide');
@@ -115,6 +148,36 @@
             }              
             
         });
+
+        $(document).on('click','#js-RemoveStaff',function(e) {
+
+            e.preventDefault();
+
+            var currObj = $(this);
+            var orgId = currObj.attr("orgId");
+            var staffId = currObj.attr("staffId");
+
+            var request = $.ajax({
+                url: "@Url.Action("RemoveStaff", "ManageUsers")",
+                method: "POST",
+                data: {
+                    orgId: orgId,
+                    staffId: staffId
+                }
+            });
+
+            request.done(function(msg) {
+                if (msg.result === true) {
+                    currObj.closest(".list-card-item").remove();
+                }
+            });
+
+            request.fail(function(jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+
+        });
+        
         
     </script>
 }
