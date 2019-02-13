@@ -11,16 +11,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
+
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class ManageOrgServ
+    public class DbOrgServ
     {
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
+        private static AppDbContext _dbContext;
+        private static IConfiguration _config;
+        private static UserManager<User> _userManager;
+        private static RoleManager<IdentityRole> _roleManager;
 
-        public ManageOrgServ(AppDbContext dbContext,
+        public DbOrgServ(AppDbContext dbContext,
             IConfiguration config,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManger)
@@ -31,30 +32,29 @@ namespace AspPlanApp.Services.DbHelpers
             _roleManager = roleManger;
         }
 
-
-        public async Task<(bool isSuccess, IEnumerable<string> errors)> OrgUpdate(IEditOrg updOrg)
+        /// <summary>
+        /// Update Organization
+        /// </summary>
+        /// <param name="updOrg">object with new organization info</param>
+        /// <returns></returns>
+        public static async Task<(bool isSuccess, IEnumerable<string> errors)> OrgUpdateAsync(IEditOrg updOrg)
         {
             var result = (isSuccess: false, errors: new List<string>());
             
             if (updOrg == null)
             {
                 result.errors.Add("Org is empty!");
-
                 return result;
             }
 
-
-            var org = await _dbContext.Org.Where(w => w.orgId == updOrg.orgId).FirstOrDefaultAsync();
-        
+            var org = await GetOrgByIdAsync(updOrg.orgId);
             if (org == null)
             {
                 result.errors.Add("Org is not exists!");
-
                 return result;
             }
 
             bool isChanged = CompareOrgs(updOrg, ref org);
-
             if (isChanged)
             {
                 _dbContext.Entry(org).State = EntityState.Modified;
@@ -78,7 +78,14 @@ namespace AspPlanApp.Services.DbHelpers
             return result;
         }
 
-        private bool CompareOrgs(IEditOrg updOrg, ref Models.DbModels.Org sourceOrg)
+        /// <summary>
+        /// Compare two organization and set change in second organization
+        /// if has found changed data
+        /// </summary>
+        /// <param name="updOrg">org with new data</param>
+        /// <param name="sourceOrg">org with old data which will be changed</param>
+        /// <returns></returns>
+        private static bool CompareOrgs(IEditOrg updOrg, ref Models.DbModels.Org sourceOrg)
         {
             bool result = false;
 
@@ -119,6 +126,26 @@ namespace AspPlanApp.Services.DbHelpers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Get Organization by ID
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public static async Task<Models.DbModels.Org> GetOrgByIdAsync(int orgId)
+        {
+            return await _dbContext.Org.Where(w => w.orgId == orgId).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Get Organization List by Owner ID
+        /// </summary>
+        /// <param name="ownerId">owner userId</param>
+        /// <returns></returns>
+        public static List<Models.DbModels.Org> GetOrgsByOwner(string ownerId)
+        {
+            return _dbContext.Org.Where(w => w.owner == ownerId).ToList();
         }
     }
 }

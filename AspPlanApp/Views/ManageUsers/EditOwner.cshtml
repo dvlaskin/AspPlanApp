@@ -96,8 +96,14 @@
                                                 <div>
                                                     @if (!@staff.isConfirm)
                                                     {
-                                                        <a href="#" title="Confirm new staff">
-                                                            <i class="fas fa-user-check" style="color: green;"></i>
+                                                        <a id="js-confirmStatus" 
+                                                           href="#" title="Confirm new staff"
+                                                           >
+                                                            <i class="fas fa-user-check" 
+                                                               id="js-ConfirmStaff"
+                                                               orgId="@staff.orgId"
+                                                               staffId="@staff.staffId" 
+                                                               style="color: green;"></i>
                                                         </a>
                                                     }
                                                     <a href="#" title="Remove staff from Company">
@@ -169,6 +175,35 @@
             request.done(function(msg) {
                 if (msg.result === true) {
                     currObj.closest(".list-card-item").remove();
+                }
+            });
+
+            request.fail(function(jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+
+        });
+        
+        $(document).on('click','#js-ConfirmStaff',function(e) {
+
+            e.preventDefault();
+
+            var currObj = $(this);
+            var orgId = currObj.attr("orgId");
+            var staffId = currObj.attr("staffId");
+
+            var request = $.ajax({
+                url: "@Url.Action("ConfirmNewStaff", "ManageUsers")",
+                method: "POST",
+                data: {
+                    orgId: orgId,
+                    staffId: staffId
+                }
+            });
+
+            request.done(function(msg) {
+                if (msg.result === true) {
+                    currObj.closest("#js-confirmStatus").remove();
                 }
             });
 

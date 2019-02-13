@@ -22,9 +22,9 @@ namespace AspPlanApp.Controllers
         private RoleManager<IdentityRole> _roleManager;
         private AppDbContext _dbContext;
         private IConfiguration _config;
-        private ManageUsersServ _userSrv;
-        private ManageOrgServ _orgServ;
-        private ManageOrgStaffServ _orgStaffServ;
+        private DbUsersServ _dbUsersServ;
+        private DbOrgServ _dbOrgServ;
+        private DbOrgStaffServ _dbOrgStaffServ;
 
         public ManageUsersController(
             UserManager<User> userManager, 
@@ -38,6 +38,8 @@ namespace AspPlanApp.Controllers
             _roleManager = roleManger;
             _dbContext = dbContext;
             _config = config;
+
+            DbServInitialization();
         }
         
         
@@ -80,9 +82,7 @@ namespace AspPlanApp.Controllers
                 return NotFound();
             }
            
-            var userSrv = new ManageUsersServ(_dbContext, _config, _userManager, _roleManager);
-            
-            EditOwnerViewModel viewModel = await userSrv.GetOwnerInfoAcync(owner);                                                
+            EditOwnerViewModel viewModel = await DbUsersServ.GetOwnerInfoAsync(owner);                                                
            
             return View(viewModel);
         }
@@ -92,8 +92,7 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userSrv = GetUsersServ();
-                var updClientResult = await userSrv.ClientUpdate(model);
+                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
 
                 if (!updClientResult.isSuccess)
                 {
@@ -105,10 +104,9 @@ namespace AspPlanApp.Controllers
                     return View();
                 }
 
-                var orgSrv = GetOrgServ();
                 foreach (var orgItem in model.Orgs)
                 {
-                    var updOrgResult = await orgSrv.OrgUpdate(orgItem);
+                    var updOrgResult = await DbOrgServ.OrgUpdateAsync(orgItem);
                     if (!updOrgResult.isSuccess)
                     {
                         foreach (var err in updOrgResult.errors)
@@ -151,8 +149,7 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userSrv = GetUsersServ();
-                var updClientResult = await userSrv.ClientUpdate(model);
+                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
 
                 if (!updClientResult.isSuccess)
                 {
@@ -191,31 +188,27 @@ namespace AspPlanApp.Controllers
         {
             var user = User;
             string userId = _userManager.GetUserId(user);
-            var orgStaffServ = GetOrgStaffServ();
-            bool removeResult = await orgStaffServ.RemoveStaffFromOrg(userId, orgId, staffId);
+            bool removeResult = await DbOrgStaffServ.RemoveStaffFromOrgAsync(userId, orgId, staffId);
             return Json (new { result = removeResult });
         }
 
-
-        private ManageUsersServ GetUsersServ()
+        [HttpPost]
+        public async Task<JsonResult> ConfirmNewStaff(int orgId, string staffId)
         {
-            if (_userSrv == null)
-                _userSrv = new ManageUsersServ(_dbContext, _config, _userManager, _roleManager);
-            return _userSrv;
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+            bool removeResult = await DbOrgStaffServ.ConfirmNewStaffAsync(userId, orgId, staffId);
+            return Json (new { result = removeResult });
         }
 
-        private ManageOrgServ GetOrgServ()
+        private void DbServInitialization()
         {
-            if (_orgServ == null)
-                _orgServ = new ManageOrgServ(_dbContext, _config, _userManager, _roleManager);
-            return _orgServ;
-        }
-        
-        private ManageOrgStaffServ GetOrgStaffServ()
-        {
-            if (_orgStaffServ == null)
-                _orgStaffServ = new ManageOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-            return _orgStaffServ;
+            if (_dbUsersServ == null)
+                _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbOrgServ == null)
+                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbOrgStaffServ == null)
+                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
         }
     }
 }

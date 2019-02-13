@@ -14,14 +14,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class ManageUsersServ
+    public class DbUsersServ
     {
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
+        private static AppDbContext _dbContext;
+        private static IConfiguration _config;
+        private static UserManager<User> _userManager;
+        private static RoleManager<IdentityRole> _roleManager;
 
-        public ManageUsersServ(AppDbContext dbContext, 
+        public DbUsersServ(AppDbContext dbContext, 
             IConfiguration config,
             UserManager<User> userManager, 
             RoleManager<IdentityRole> roleManger)
@@ -32,8 +32,13 @@ namespace AspPlanApp.Services.DbHelpers
             _roleManager = roleManger;
         }
         
-        
-        public async Task<EditOwnerViewModel> GetOwnerInfoAcync(User user)
+        /// <summary>
+        /// Get User Info with Owner Role
+        /// User data, Organization data, Staff in organization data
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static async Task<EditOwnerViewModel> GetOwnerInfoAsync(User user)
         {
             if (user == null) return null;
 
@@ -48,9 +53,8 @@ namespace AspPlanApp.Services.DbHelpers
                     OldPassword = string.Empty,
                     ConfirmNewPassword = string.Empty
                 };
-                
-                result.Orgs = _dbContext.Org
-                    .Where(w => w.owner == user.Id).ToList();
+              
+                result.Orgs = DbOrgServ.GetOrgsByOwner(user.Id);
                 
                 ConnectionDb conn = new ConnectionDb(_config);
 
@@ -82,7 +86,12 @@ namespace AspPlanApp.Services.DbHelpers
             });
         }
 
-        public async Task<(bool isSuccess, IEnumerable<string> errors)> ClientUpdate(IEditClient updUser)
+        /// <summary>
+        /// Update User with Client Role
+        /// </summary>
+        /// <param name="updUser">client role object with new data</param>
+        /// <returns></returns>
+        public static async Task<(bool isSuccess, IEnumerable<string> errors)> ClientUpdateAsync(IEditClient updUser)
         {
 
             var result = (isSuccess: false, errors: new List<string>());
@@ -152,7 +161,14 @@ namespace AspPlanApp.Services.DbHelpers
             return result;
         }
 
-        private bool CompareUsers(IEditClient updUser, ref User user)
+        /// <summary>
+        /// Compare two Client and set change in second Client
+        /// if has found changed data
+        /// </summary>
+        /// <param name="updUser">client with new data</param>
+        /// <param name="user">client with old data which will be changed</param>
+        /// <returns></returns>
+        private static bool CompareUsers(IEditClient updUser, ref User user)
         {
             bool result = false;
 
