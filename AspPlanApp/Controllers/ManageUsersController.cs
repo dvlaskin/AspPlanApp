@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,9 +66,13 @@ namespace AspPlanApp.Controllers
             {
                 return RedirectToAction(nameof(EditOwner), "ManageUsers", new {id = userId});
             }
+            else if (user.IsInRole(AppRoles.Staff))
+            {
+                return RedirectToAction(nameof(EditStaff), "ManageUsers", new {id = userId});
+            }
             else
             {
-                return RedirectToAction("EditClient", "ManageUsers", new { id = userId});
+                return RedirectToAction(nameof(EditClient), "ManageUsers", new { id = userId});
             }
             
         }
@@ -121,6 +126,34 @@ namespace AspPlanApp.Controllers
             }
             
             return RedirectToAction(nameof(EditOwner), "ManageUsers", new { id = model.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditStaff(string id)
+        {
+            User user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            Models.DbModels.Org orgData = await DbOrgStaffServ.GetOrgByStaffIdAsync(user.Id);
+            
+            EditStaffViewModel model = new EditStaffViewModel()
+            {
+                Id = user.Id, 
+                Name = user.UserName,
+                Email = user.Email, 
+                NewPassword = string.Empty,
+                OldPassword = string.Empty,
+                ConfirmNewPassword = string.Empty,
+                OrgId = orgData.orgId,
+                OrgName = orgData.orgName
+            };
+            
+            
+            
+            return View(model);
         }
 
         [HttpGet]
@@ -198,7 +231,26 @@ namespace AspPlanApp.Controllers
             var user = User;
             string userId = _userManager.GetUserId(user);
             bool removeResult = await DbOrgStaffServ.ConfirmNewStaffAsync(userId, orgId, staffId);
-            return Json (new { result = removeResult });
+            return Json(new { result = removeResult });
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> SearchOrgByName(string strOrg)
+        {
+            var orgArray = await DbOrgServ.SearchOrgName(strOrg);
+            List<SearchOrgViewModel> orgInfo = new List<SearchOrgViewModel>();
+            foreach (var item in orgArray)
+            {
+                orgInfo.Add(new SearchOrgViewModel()
+                    {
+                        orgId = item.orgId,
+                        orgName = item.orgName,
+                        orgInfo = string.Format($"{item.city} / {item.address}")
+                    }
+                );
+            }
+
+            return Json(orgInfo);
         }
 
         private void DbServInitialization()

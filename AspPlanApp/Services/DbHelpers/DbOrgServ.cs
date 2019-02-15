@@ -147,5 +147,18 @@ namespace AspPlanApp.Services.DbHelpers
         {
             return _dbContext.Org.Where(w => w.owner == ownerId).ToList();
         }
+
+        /// <summary>
+        /// Search Organization By Name
+        /// </summary>
+        /// <param name="strOrgName"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<Models.DbModels.Org>> SearchOrgName(string strOrgName)
+        {
+            return await _dbContext.Org
+                .Where(w => w.orgName.Contains(strOrgName))
+                .Take(10)
+                .ToArrayAsync();
+        }
     }
 }

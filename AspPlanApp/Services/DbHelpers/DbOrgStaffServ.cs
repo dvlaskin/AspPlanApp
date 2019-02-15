@@ -89,7 +89,7 @@ namespace AspPlanApp.Services.DbHelpers
         }
 
         /// <summary>
-        /// Get Organization
+        /// Get Organization Staff
         /// </summary>
         /// <param name="orgId"></param>
         /// <param name="staffId"></param>
@@ -99,6 +99,23 @@ namespace AspPlanApp.Services.DbHelpers
             return await _dbContext.OrgStaff
                 .Where(w => w.orgId == orgId && w.staffId == staffId)
                 .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Get Organization by Staff
+        /// </summary>
+        /// <param name="staffId"></param>
+        /// <returns></returns>
+        public static async Task<Models.DbModels.Org> GetOrgByStaffIdAsync(string staffId)
+        {
+            int orgId = await _dbContext.OrgStaff
+                .Where(w => w.staffId == staffId)
+                .Select(s => s.orgId)
+                .FirstOrDefaultAsync();
+
+            if (orgId == 0) return null;
+                
+            return await DbOrgServ.GetOrgByIdAsync(orgId);
         }
     }
 }

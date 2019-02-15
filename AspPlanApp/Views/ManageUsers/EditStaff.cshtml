@@ -1,0 +1,121 @@
+﻿@model AspPlanApp.Models.ManageUsersViewModels.EditStaffViewModel
+
+@{
+    ViewBag.Title = "Edit Staff Info";
+    Layout = "_Layout";
+}
+
+<div class="auth-form">
+    <div class="container h-100">
+        <div class="row h-100 align-items-center justify-content-center">
+            <div class="form col-lg-4 col-md-10">
+                <form asp-action="EditStaff" asp-controller="ManageUsers">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div>
+                        <input type="hidden" asp-for="Id" />
+                    </div>
+                    <div>
+                        <label asp-for="Name" class="control-label">User Name</label>
+                        <input type="text" asp-for="Name" class="form-control" />
+                    </div>
+                    <div>
+                        <label asp-for="Email" class="control-label">Email</label>
+                        <input type="email" asp-for="Email" class="form-control" />
+                    </div>
+                    <div>
+                        <label asp-for="OrgName" class="control-label">Company</label>
+                        <input id="js-orgId" type="hidden" asp-for="OrgId" />
+                        <input id="js-live-search" type="text" 
+                               asp-for="OrgName" class="form-control" 
+                               placeholder="Type to start searching ..."/>
+                        <div id="js-display">
+                            <ul id="js-found-org" class="found-items">
+                                
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <label asp-for="OldPassword" class="control-label">Old Password</label>
+                        <input type="password" asp-for="OldPassword" class="form-control" />
+                    </div>
+                    <div>
+                        <label asp-for="NewPassword" class="control-label">New Password</label>
+                        <input type="password" asp-for="NewPassword" class="form-control" />
+                    </div>
+                    <div>
+                        <label asp-for="ConfirmNewPassword" class="control-label">Confirm Password</label>
+                        <input type="password" asp-for="ConfirmNewPassword" class="form-control" />
+                    </div>
+                    
+                    <button type="submit">Save</button>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function() {
+
+            $("#js-live-search").keyup(function() {
+
+                var name = $('#js-live-search').val();
+                //console.log(name);
+                if (name == "") {
+                    $("#js-display").html("").hide();
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "@Url.Action("SearchOrgByName", "ManageUsers")",
+                        data: {
+                            strOrg: name
+                        },
+
+                        success: function(resultOrg) {
+                            
+                            var resultHtml = "";
+                            resultOrg.forEach(function(item) {
+                                resultHtml +=
+                                `<li id="js-found-org" 
+                                class="found-item"
+                                orgId="${item.orgId}" 
+                                orgName="${item.orgName}">${item.orgName} - ${item.orgInfo}</li>`;
+                            });
+                            
+                            $("#js-display").show();
+                            $("#js-found-org").html(resultHtml).show();
+                        }
+                    });
+                }
+            });
+            
+            $(window).click(function() {
+                $("#js-display").hide();
+            });
+            
+            $(document).on('click','.found-item',function(e) {
+
+                //console.log("click");
+
+                e.preventDefault();
+
+                var currObj = $(this);
+                var orgId = currObj.attr("orgId");
+                var orgName = currObj.attr("orgName");
+
+                $("#js-orgId").val(orgId);
+                $("#js-live-search").val(orgName);
+                $("#js-display").hide();
+
+            });
+
+        });
+
+
+    </script>
+}
