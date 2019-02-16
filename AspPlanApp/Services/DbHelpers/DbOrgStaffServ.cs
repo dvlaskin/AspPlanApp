@@ -25,6 +25,56 @@ namespace AspPlanApp.Services.DbHelpers
             _userManager = userManager;
             _roleManager = roleManger;
         }
+
+        /// <summary>
+        /// Add new staff in OrgStaff table
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        private static async Task<bool> AddNewStaff(string userId, int orgId)
+        {
+            OrgStaff orgStaff = new OrgStaff()
+            {
+                orgId = orgId,
+                staffId = userId,
+                isConfirm = false
+            };
+
+            _dbContext.Entry(orgStaff).State = EntityState.Added;
+            var result =  await _dbContext.SaveChangesAsync();
+
+            return result == 1;
+        }
+
+        /// <summary>
+        /// Change Organization where work Staff User
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public static async Task<bool> ChangeOrgForStaff(string userId, int orgId)
+        {
+            bool result = false;
+
+            if (string.IsNullOrEmpty(userId) || orgId == 0) return result;
+            
+            OrgStaff currOrgStaff = _dbContext.OrgStaff.FirstOrDefault(w => w.staffId == userId);
+
+            if (currOrgStaff == null)
+            {
+                result = await AddNewStaff(userId, orgId);
+            }
+            else
+            {
+                currOrgStaff.orgId = orgId;
+                _dbContext.Entry(currOrgStaff).State = EntityState.Modified;
+                var updResult = await _dbContext.SaveChangesAsync();
+                result = updResult == 1;
+            }
+
+            return result;
+        }
         
         /// <summary>
         /// Remove Staff from Organization

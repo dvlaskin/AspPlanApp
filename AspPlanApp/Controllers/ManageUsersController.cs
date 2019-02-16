@@ -147,13 +147,47 @@ namespace AspPlanApp.Controllers
                 NewPassword = string.Empty,
                 OldPassword = string.Empty,
                 ConfirmNewPassword = string.Empty,
-                OrgId = orgData.orgId,
-                OrgName = orgData.orgName
+                OrgId = 0,
+                OrgName = string.Empty
             };
+
+            if (orgData != null)
+            {
+                model.OrgId = orgData.orgId;
+                model.OrgName = orgData.orgName;
+            }
             
             
             
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditStaff(EditStaffViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
+
+                if (!updClientResult.isSuccess)
+                {
+                    foreach (var err in updClientResult.errors)
+                    {
+                        ModelState.AddModelError(string.Empty, err);
+                    }
+                    
+                    return View();
+                }
+
+                var updOrgResult = await DbOrgStaffServ.ChangeOrgForStaff(model.Id, model.OrgId);
+                if (!updOrgResult)
+                {
+                    ModelState.AddModelError(string.Empty, "Company has not changed.");
+                    return View();
+                }
+            }
+            
+            return RedirectToAction(nameof(EditStaff), "ManageUsers", new { id = model.Id });
         }
 
         [HttpGet]
