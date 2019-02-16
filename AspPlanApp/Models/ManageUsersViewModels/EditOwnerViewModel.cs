@@ -5,12 +5,12 @@ namespace AspPlanApp.Models.ManageUsersViewModels
 {
     public interface IEditOwner : IEditClient
     {
-        IEnumerable<DbModels.Org> Orgs { get; set; } 
+        List<DbModels.Org> Orgs { get; set; } 
         
-        IEnumerable<OwnerOrgStaffViewModel> Staff { get; set; }
+        List<OwnerOrgStaffViewModel> Staff { get; set; }
     }
     
-    public class EditOwnerViewModel : EditClientViewModel
+    public class EditOwnerViewModel : EditClientViewModel, IEditOwner
     {
         public List<DbModels.Org> Orgs { get; set; } 
         

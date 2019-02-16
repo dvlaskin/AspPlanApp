@@ -45,22 +45,15 @@ namespace AspPlanApp.Controllers
         
         
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var user = User;
 
             string userId = _userManager.GetUserId(user);
-
-            /* todo: закончить роутинг корректировки пользователей
-              в зависимости от роли 
-              - для админа все
-              - для владельца - персонал
-              - для персонала и пользователей - сразу ред. свои данные
-             */
-            
+           
             if (user.IsInRole(AppRoles.Admin))
             {
-                return View(_userManager.Users.ToList());
+                return View(await DbUsersServ.GetUserListAsync());
             }
             else if (user.IsInRole(AppRoles.Owner))
             {

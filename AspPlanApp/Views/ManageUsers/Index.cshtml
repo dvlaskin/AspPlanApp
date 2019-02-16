@@ -1,4 +1,4 @@
-﻿@model System.Collections.Generic.List<AspPlanApp.Models.DbModels.User>
+﻿@model List<AspPlanApp.Models.ManageUsersViewModels.UsersListViewModel>
 
 @{
     ViewBag.Title = "Manage Users";
@@ -10,16 +10,29 @@
         <tr>
             <th>Email</th>
             <th>UserName</th>
+            <th>UserRole</th>
             <th>Action</th
         ></tr>
         @foreach (var user in Model)
         {
             <tr>
-                <td>@user.Email</td>
+                <td>@user.UserMail</td>
                 <td>@user.UserName</td>
+                <td>@user.UserRole</td>
                 <td>
-                    <form asp-action="Delete" asp-route-id="@user.Id" method="post">
-                        <a class="btn btn-sm btn-primary" asp-action="EditClient" asp-route-id="@user.Id">Edit</a>
+                    <form asp-action="Delete" asp-route-id="@user.UserId" method="post">
+                        @if (@user.UserRole == "owner")
+                        {
+                            <a class="btn btn-sm btn-primary" asp-action="EditOwner" asp-route-id="@user.UserId">Edit</a>
+                        }
+                        else if (@user.UserRole == "staff")
+                        {
+                            <a class="btn btn-sm btn-primary" asp-action="EditStaff" asp-route-id="@user.UserId">Edit</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-primary" asp-action="EditClient" asp-route-id="@user.UserId">Edit</a>
+                        }
                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                     </form>
                 </td>

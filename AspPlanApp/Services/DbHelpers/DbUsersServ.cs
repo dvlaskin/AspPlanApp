@@ -187,5 +187,38 @@ namespace AspPlanApp.Services.DbHelpers
             return result;
         }
 
+        /// <summary>
+        /// Get User List with short info
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<List<UsersListViewModel>> GetUserListAsync()
+        {
+
+            return await Task.Run(async () =>
+            {
+                List<UsersListViewModel> result = new List<UsersListViewModel>();
+                ConnectionDb conn = new ConnectionDb(_config);
+                using (IDbConnection sqlCon = conn.GetConnection)
+                {
+                    string query = @"
+                    select 
+                        u.id as UserId,
+                        u.UserName,
+                        u.Email as UserMail,
+                        r.name as UserRole
+                    from User u
+                    join UserRole ur on u.id = ur.UserId
+                    join Role r on r.id = ur.RoleId
+                    ";
+
+                    ConnectionDb.OpenConnect(sqlCon);
+                    var resultQuery = await sqlCon.QueryAsync<UsersListViewModel>(query);
+                    result = resultQuery.ToList();
+                }
+
+                return result;
+            });
+        }
+
     }
 }
