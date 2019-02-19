@@ -17,6 +17,7 @@ namespace AspPlanApp.Models
         public DbSet<DbModels.User> User { get; set; }
         public DbSet<DbModels.Org> Org { get; set; }
         public DbSet<DbModels.OrgStaff> OrgStaff { get; set; }
+        public DbSet<DbModels.Category> Category { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -33,6 +34,9 @@ namespace AspPlanApp.Models
             builder.Entity<IdentityRoleClaim<string>>().ToTable("UserRoleClaim");
 
             builder.Entity<DbModels.Org>().HasKey(k => k.orgId);
+            builder.Entity<DbModels.OrgStaff>().HasKey(k => k.orgStaffId);
+            builder.Entity<DbModels.Category>().HasKey(k => k.catId);
+            
         }
     }
 }

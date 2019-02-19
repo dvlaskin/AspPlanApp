@@ -26,6 +26,7 @@ namespace AspPlanApp.Controllers
         private DbUsersServ _dbUsersServ;
         private DbOrgServ _dbOrgServ;
         private DbOrgStaffServ _dbOrgStaffServ;
+        private DbCategoryServ _dbCategoryServ;
 
         public ManageUsersController(
             UserManager<User> userManager, 
@@ -80,7 +81,8 @@ namespace AspPlanApp.Controllers
                 return NotFound();
             }
            
-            EditOwnerViewModel viewModel = await DbUsersServ.GetOwnerInfoAsync(owner);                                                
+            EditOwnerViewModel viewModel = await DbUsersServ.GetOwnerInfoAsync(owner);
+            ViewBag.CatList = await DbCategoryServ.GetCatListAsync();
            
             return View(viewModel);
         }
@@ -288,6 +290,9 @@ namespace AspPlanApp.Controllers
                 _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
             if (_dbOrgStaffServ == null)
                 _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbCategoryServ == null)
+                _dbCategoryServ = new DbCategoryServ(_dbContext);
+            
         }
     }
 }

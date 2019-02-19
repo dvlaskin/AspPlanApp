@@ -10,6 +10,7 @@
         string city { get; set; }
         string country { get; set; }
         string phoneNumber { get; set; }
+        int category { get; set; }
     }
     
     /// <summary>
@@ -25,6 +26,6 @@
         public string city { get; set; }
         public string country { get; set; }
         public string phoneNumber { get; set; }
-
+        public int category { get; set; }
     }
 }

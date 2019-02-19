@@ -124,6 +124,12 @@ namespace AspPlanApp.Services.DbHelpers
                 sourceOrg.phoneNumber = updOrg.phoneNumber;
                 result = true;
             }
+            
+            if (sourceOrg.category != updOrg.category)
+            {
+                sourceOrg.category = updOrg.category;
+                result = true;
+            }
 
             return result;
         }
@@ -160,5 +166,6 @@ namespace AspPlanApp.Services.DbHelpers
                 .Take(10)
                 .ToArrayAsync();
         }
+        
     }
 }
