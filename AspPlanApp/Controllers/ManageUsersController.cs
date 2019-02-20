@@ -14,6 +14,7 @@ using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Configuration;
 
+
 namespace AspPlanApp.Controllers
 {
     [Authorize]
@@ -227,6 +228,15 @@ namespace AspPlanApp.Controllers
             }
             
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewOrg(Models.DbModels.Org model)
+        {
+            var user =  await _userManager.GetUserAsync(User);
+            model.owner = user.Id;
+            await DbOrgServ.AddNewOrg(model);
+            return RedirectToAction(nameof(EditOwner), "ManageUsers", new { id = user.Id });
         }
         
         [HttpPost]

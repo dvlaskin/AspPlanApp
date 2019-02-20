@@ -163,6 +163,7 @@ li {
     transition: all 0.3 ease;
     cursor: pointer;
     border-radius: 7px;
+    margin: 15px 0px;
 }
     .form button:hover,.form button:active,.form button:focus {
         background: #FF6E40;
@@ -229,6 +230,11 @@ li {
         background-color: #f9f9f9;
         border-color: #FF6E40;
     }
+    
+.modal-content {
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    border-radius: 7px;
+}
 
 
 /* Menu left side style */

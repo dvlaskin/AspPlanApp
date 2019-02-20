@@ -162,9 +162,22 @@ namespace AspPlanApp.Services.DbHelpers
         public static async Task<IEnumerable<Models.DbModels.Org>> SearchOrgName(string strOrgName)
         {
             return await _dbContext.Org
-                .Where(w => w.orgName.Contains(strOrgName))
+                .Where( w => w.orgName.ToLower().Contains(strOrgName.ToLower()) )
                 .Take(10)
                 .ToArrayAsync();
+        }
+
+        /// <summary>
+        /// Add new org
+        /// </summary>
+        /// <param name="org"></param>
+        /// <returns></returns>
+        public static async Task<bool> AddNewOrg(Models.DbModels.Org org)
+        {
+            _dbContext.Entry(org).State = EntityState.Added;
+            var result = await _dbContext.SaveChangesAsync();
+
+            return result == 1;
         }
         
     }

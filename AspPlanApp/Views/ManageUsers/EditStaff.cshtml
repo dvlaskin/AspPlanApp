@@ -28,7 +28,7 @@
                         <input id="js-live-search" type="text" 
                                asp-for="OrgName" class="form-control" 
                                placeholder="Type to start searching ..."
-                               autocomplete="off"/>
+                               autocomplete="off" />
                         <div id="js-display">
                             <ul id="js-found-org" class="found-items">
                                 
@@ -66,9 +66,11 @@
             $("#js-live-search").keyup(function() {
 
                 var name = $('#js-live-search').val();
+                
                 //console.log(name);
+                
                 if (name == "") {
-                    $("#js-display").html("").hide();
+                    $("#js-display").hide();
                 } else {
                     $.ajax({
                         type: "GET",
@@ -81,6 +83,7 @@
                             
                             var resultHtml = "";
                             resultOrg.forEach(function(item) {
+
                                 resultHtml +=
                                 `<li id="js-found-org" 
                                 class="found-item"
@@ -88,8 +91,15 @@
                                 orgName="${item.orgName}">${item.orgName} - ${item.orgInfo}</li>`;
                             });
                             
-                            $("#js-display").show();
-                            $("#js-found-org").html(resultHtml).show();
+                            //console.log(resultHtml);
+                            
+                            if (resultHtml) {
+                                $("#js-display").show();
+                                $("#js-found-org").html(resultHtml);
+                                $("#js-found-org").show();
+                            } else {
+                                $("#js-display").hide();
+                            }
                         }
                     });
                 }
