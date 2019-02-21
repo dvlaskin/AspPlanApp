@@ -169,6 +169,10 @@ li {
         background: #FF6E40;
     }
 
+.bt-danger {
+    color: red;
+}
+
 
 .list-card-item {
     top: 0;

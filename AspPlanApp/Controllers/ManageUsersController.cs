@@ -273,6 +273,17 @@ namespace AspPlanApp.Controllers
             return Json(new { result = removeResult });
         }
 
+        [HttpDelete]
+        public async Task<JsonResult> DeleteOrg(int orgId)
+        {
+            bool result = false;
+            var user = await _userManager.GetUserAsync(User);
+
+            result = await DbOrgServ.DeleteOrg(user.Id, orgId);
+
+            return Json(new { result = result});
+        }
+
         [HttpGet]
         public async Task<JsonResult> SearchOrgByName(string strOrg)
         {

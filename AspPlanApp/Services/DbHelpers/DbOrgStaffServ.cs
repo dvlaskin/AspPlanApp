@@ -68,6 +68,7 @@ namespace AspPlanApp.Services.DbHelpers
             else
             {
                 currOrgStaff.orgId = orgId;
+                currOrgStaff.isConfirm = false;
                 _dbContext.Entry(currOrgStaff).State = EntityState.Modified;
                 var updResult = await _dbContext.SaveChangesAsync();
                 result = updResult == 1;

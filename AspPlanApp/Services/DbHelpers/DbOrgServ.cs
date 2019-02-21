@@ -179,6 +179,44 @@ namespace AspPlanApp.Services.DbHelpers
 
             return result == 1;
         }
+
+        /// <summary>
+        /// Delete Company from user Organizations
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public static async Task<bool> DeleteOrg(string userId, int orgId)
+        {
+            bool result = false;
+
+            if (string.IsNullOrEmpty(userId) || orgId == 0) return result;
+            
+            Models.DbModels.Org org = await _dbContext.Org
+                .Where(w => w.owner == userId && w.orgId == orgId)
+                .FirstOrDefaultAsync();
+
+            if (org != null)
+            {
+                _dbContext.Entry(org).State = EntityState.Deleted;
+                int isDel = _dbContext.SaveChanges();
+
+                result = isDel == 1;
+            }
+
+            if (result)
+            {
+                var deletedOrgStaff = _dbContext.OrgStaff.Where(w => w.orgId == orgId).ToArray();
+                foreach (var orgStaff in deletedOrgStaff)
+                {
+                    _dbContext.Entry(orgStaff).State = EntityState.Deleted;
+                }
+                
+                _dbContext.SaveChanges();
+            }
+
+            return result;
+        }
         
     }
 }

@@ -63,7 +63,6 @@
                             <div asp-validation-summary="All" class="text-danger"></div>
                             <div>
                                 <input type="hidden" asp-for="@Model.Orgs[i].orgId"/>
-               
                             </div>
                             <div>
                                 <label asp-for="@Model.Orgs[i].orgName" class="control-label">Company</label>
@@ -141,8 +140,10 @@
                             </div>
                             
                             <button type="submit" >Save All</button>   
-                          
-                           
+                            <a href="#" 
+                               orgId = "@Model.Orgs[i].orgId" 
+                               class="js-delOrg bt-danger">Delete Company @Model.Orgs[i].orgName</a>
+                            <hr/>
                         </div>
                         
                     </div>                     
@@ -156,7 +157,6 @@
         </div>
     </div>
 
-<!-- ------------------------------------------------- -->
 <!-- Modal -->
     <div class="modal fade" id="modal-new-org" tabindex="-1" role="dialog" aria-labelledby="modal-new-orgTitle" aria-hidden="true">
         
@@ -225,80 +225,115 @@
 
     <script>
 
-        $(document).on('click', '.ul-sub-level', function(e) {
-            
-            e.preventDefault();
+        $(document).on('click',
+            '.ul-sub-level',
+            function(e) {
 
-            var editDiv = $(this).closest('div').find('.data-edit').first();
-            
-            if (editDiv.hasClass('hide')) {
-                editDiv.removeClass('hide');
-            } 
-            else {
-                editDiv.addClass('hide');
-            }              
-            
-        });
+                e.preventDefault();
 
-        $(document).on('click','#js-RemoveStaff',function(e) {
+                var editDiv = $(this).closest('div').find('.data-edit').first();
 
-            e.preventDefault();
+                if (editDiv.hasClass('hide')) {
+                    editDiv.removeClass('hide');
+                } else {
+                    editDiv.addClass('hide');
+                }
 
-            var currObj = $(this);
-            var orgId = currObj.attr("orgId");
-            var staffId = currObj.attr("staffId");
+            });
 
-            var request = $.ajax({
-                url: "@Url.Action("RemoveStaff", "ManageUsers")",
-                method: "POST",
-                data: {
-                    orgId: orgId,
-                    staffId: staffId
+        $(document).on('click',
+            '#js-RemoveStaff',
+            function(e) {
+
+                e.preventDefault();
+
+                var currObj = $(this);
+                var orgId = currObj.attr("orgId");
+                var staffId = currObj.attr("staffId");
+
+                var request = $.ajax({
+                    url: "@Url.Action("RemoveStaff", "ManageUsers")",
+                    method: "POST",
+                    data: {
+                        orgId: orgId,
+                        staffId: staffId
+                    }
+                });
+
+                request.done(function(msg) {
+                    if (msg.result === true) {
+                        currObj.closest(".list-card-item").remove();
+                    }
+                });
+
+                request.fail(function(jqXHR, textStatus) {
+                    alert("Request failed: " + textStatus);
+                });
+
+            });
+
+        $(document).on('click',
+            '#js-ConfirmStaff',
+            function(e) {
+
+                e.preventDefault();
+
+                var currObj = $(this);
+                var orgId = currObj.attr("orgId");
+                var staffId = currObj.attr("staffId");
+
+                var request = $.ajax({
+                    url: "@Url.Action("ConfirmNewStaff", "ManageUsers")",
+                    method: "POST",
+                    data: {
+                        orgId: orgId,
+                        staffId: staffId
+                    }
+                });
+
+                request.done(function(msg) {
+                    if (msg.result === true) {
+                        currObj.closest("#js-confirmStatus").remove();
+                    }
+                });
+
+                request.fail(function(jqXHR, textStatus) {
+                    alert("Request failed: " + textStatus);
+                });
+
+            });
+
+        $(document).on('click',
+            '.js-delOrg',
+            function(e) {
+                e.preventDefault();
+
+                var msgText = $(this).html();
+                if (confirm(msgText + '?')) {
+
+                    var orgId = $(this).attr('orgId');
+                    var request = $.ajax({
+                        url: "@Url.Action("DeleteOrg", "ManageUsers")",
+                        method: "DELETE",
+                        data: {
+                            orgId: orgId
+                        }
+                    });
+                    
+                    request.done(function(msg) {
+                        if (msg.result === true) {
+                            location.reload();
+                        }
+                    });
+
+                    request.fail(function(jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+
                 }
             });
 
-            request.done(function(msg) {
-                if (msg.result === true) {
-                    currObj.closest(".list-card-item").remove();
-                }
-            });
 
-            request.fail(function(jqXHR, textStatus) {
-                alert("Request failed: " + textStatus);
-            });
-
-        });
-        
-        $(document).on('click','#js-ConfirmStaff',function(e) {
-
-            e.preventDefault();
-
-            var currObj = $(this);
-            var orgId = currObj.attr("orgId");
-            var staffId = currObj.attr("staffId");
-
-            var request = $.ajax({
-                url: "@Url.Action("ConfirmNewStaff", "ManageUsers")",
-                method: "POST",
-                data: {
-                    orgId: orgId,
-                    staffId: staffId
-                }
-            });
-
-            request.done(function(msg) {
-                if (msg.result === true) {
-                    currObj.closest("#js-confirmStatus").remove();
-                }
-            });
-
-            request.fail(function(jqXHR, textStatus) {
-                alert("Request failed: " + textStatus);
-            });
-
-        });
-        
-        
     </script>
 }
 
