@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AspPlanApp.Models;
+using AspPlanApp.Services.DbHelpers;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,8 +12,31 @@ namespace AspPlanApp.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private AppDbContext _dbContext;
+        private DbCategoryServ _dbCategoryServ;
+        
+        public HomeController(AppDbContext dbContext)
         {
+            _dbContext = dbContext;
+            
+            DbServInitialization();
+        }
+        
+        private void DbServInitialization()
+        {
+//            _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
+//            _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
+//            _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
+            
+            if (_dbCategoryServ == null)
+            _dbCategoryServ = new DbCategoryServ(_dbContext);
+            
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.Categories = await DbCategoryServ.GetCatListAsync();
+            
             return View();
         }
 
@@ -34,5 +58,6 @@ namespace AspPlanApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

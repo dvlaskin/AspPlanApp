@@ -45,6 +45,18 @@ namespace AspPlanApp.Controllers
             DbServInitialization();
         }
         
+        private void DbServInitialization()
+        {
+            if (_dbUsersServ == null)
+                _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbOrgServ == null)
+                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbOrgStaffServ == null)
+                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
+            if (_dbCategoryServ == null)
+                _dbCategoryServ = new DbCategoryServ(_dbContext);
+        }
+        
         
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -303,17 +315,6 @@ namespace AspPlanApp.Controllers
             return Json(orgInfo);
         }
 
-        private void DbServInitialization()
-        {
-            if (_dbUsersServ == null)
-                _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbOrgServ == null)
-                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbOrgStaffServ == null)
-                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbCategoryServ == null)
-                _dbCategoryServ = new DbCategoryServ(_dbContext);
-            
-        }
+
     }
 }

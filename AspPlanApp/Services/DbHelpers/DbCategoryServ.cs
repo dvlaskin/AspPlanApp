@@ -10,6 +10,7 @@ namespace AspPlanApp.Services.DbHelpers
     {
         private static AppDbContext _dbContext;
         
+        
         public DbCategoryServ(AppDbContext dbContext)
         {
             _dbContext = dbContext;

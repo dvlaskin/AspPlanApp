@@ -31,6 +31,7 @@ namespace AspPlanApp.Services.DbHelpers
             _userManager = userManager;
             _roleManager = roleManger;
         }
+        
 
         /// <summary>
         /// Update Organization
@@ -57,8 +58,7 @@ namespace AspPlanApp.Services.DbHelpers
             bool isChanged = CompareOrgs(updOrg, ref org);
             if (isChanged)
             {
-                _dbContext.Entry(org).State = EntityState.Modified;
-
+                _dbContext.Org.Update(org);
                 var updResult = await _dbContext.SaveChangesAsync();
 
                 if (updResult == 0)
@@ -174,7 +174,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <returns></returns>
         public static async Task<bool> AddNewOrg(Models.DbModels.Org org)
         {
-            _dbContext.Entry(org).State = EntityState.Added;
+            await _dbContext.Org.AddAsync(org);
             var result = await _dbContext.SaveChangesAsync();
 
             return result == 1;
@@ -198,7 +198,7 @@ namespace AspPlanApp.Services.DbHelpers
 
             if (org != null)
             {
-                _dbContext.Entry(org).State = EntityState.Deleted;
+                _dbContext.Org.Remove(org);
                 int isDel = _dbContext.SaveChanges();
 
                 result = isDel == 1;
@@ -207,11 +207,7 @@ namespace AspPlanApp.Services.DbHelpers
             if (result)
             {
                 var deletedOrgStaff = _dbContext.OrgStaff.Where(w => w.orgId == orgId).ToArray();
-                foreach (var orgStaff in deletedOrgStaff)
-                {
-                    _dbContext.Entry(orgStaff).State = EntityState.Deleted;
-                }
-                
+                _dbContext.OrgStaff.RemoveRange(deletedOrgStaff);
                 _dbContext.SaveChanges();
             }
 

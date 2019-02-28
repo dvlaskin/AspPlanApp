@@ -25,6 +25,7 @@ namespace AspPlanApp.Services.DbHelpers
             _userManager = userManager;
             _roleManager = roleManger;
         }
+        
 
         /// <summary>
         /// Add new staff in OrgStaff table
@@ -41,7 +42,7 @@ namespace AspPlanApp.Services.DbHelpers
                 isConfirm = false
             };
 
-            _dbContext.Entry(orgStaff).State = EntityState.Added;
+            _dbContext.OrgStaff.Add(orgStaff);
             var result =  await _dbContext.SaveChangesAsync();
 
             return result == 1;
@@ -98,7 +99,7 @@ namespace AspPlanApp.Services.DbHelpers
             if (orgStaff == null) 
                 return result;
             
-            _dbContext.Entry(orgStaff).State = EntityState.Deleted;
+            _dbContext.OrgStaff.Remove(orgStaff);
             int remResult = await _dbContext.SaveChangesAsync();
 
             if (remResult == 1)
@@ -130,7 +131,7 @@ namespace AspPlanApp.Services.DbHelpers
 
             orgStaff.isConfirm = true;
             
-            _dbContext.Entry(orgStaff).State = EntityState.Modified;
+            _dbContext.OrgStaff.Update(orgStaff);
             int remResult = await _dbContext.SaveChangesAsync();
 
             if (remResult == 1)
