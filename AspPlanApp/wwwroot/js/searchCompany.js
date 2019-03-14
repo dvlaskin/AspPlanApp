@@ -2,9 +2,10 @@ $(document).ready(function() {
 
     $("#js-live-search").keyup(function() {
 
-        var name = $('#js-live-search').val();
-
-        console.log(name);
+        let name = $('#js-live-search').val();
+        let catId = $('#js-category option:selected').attr('value');
+        
+        console.log(catId);
 
         if (name == "") {
             $("#js-display").hide();
@@ -13,7 +14,8 @@ $(document).ready(function() {
                 type: "GET",
                 url: "api/SearchOrgByName",
                 data: {
-                    strOrg: name
+                    strOrg: name,
+                    catId: catId
                 },
 
                 success: function(resultOrg) {

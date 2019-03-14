@@ -20,8 +20,8 @@
                             <form action="#" method="get">
                                 <div class="row" style="width: 100%">
                                     <div class="col-sm-12 col-md-3 field" >
-                                        <select class="form-control">
-                                            <option selected>All Catagories</option>
+                                        <select id="js-category" class="form-control">
+                                            <option value="0" selected>All Catagories</option>
                                             @foreach (Category cat in ViewBag.Categories)
                                             {
                                                 <option value="@cat.catId">@cat.catName</option>

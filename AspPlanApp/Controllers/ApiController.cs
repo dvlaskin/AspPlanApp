@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AspPlanApp.Models;
 using AspPlanApp.Models.DbModels;
@@ -43,11 +44,17 @@ namespace AspPlanApp.Controllers
         /// Поиск организации по названию
         /// </summary>
         /// <param name="strOrg"></param>
+        /// <param name="catId"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<JsonResult> SearchOrgByName(string strOrg)
+        public async Task<JsonResult> SearchOrgByName(string strOrg, int catId=0)
         {
             var orgArray = await DbOrgServ.SearchOrgName(strOrg);
+            if (catId != 0)
+            {
+                orgArray = orgArray.Where(w => w.category == catId).ToArray();
+            }
+            
             List<SearchOrgViewModel> orgInfo = new List<SearchOrgViewModel>();
             foreach (var item in orgArray)
             {
