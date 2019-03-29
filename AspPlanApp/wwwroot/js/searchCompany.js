@@ -5,7 +5,7 @@ $(document).ready(function() {
         let name = $('#js-live-search').val();
         let catId = $('#js-category option:selected').attr('value');
         
-        console.log(catId);
+        //console.log(catId);
 
         if (name == "") {
             $("#js-display").hide();

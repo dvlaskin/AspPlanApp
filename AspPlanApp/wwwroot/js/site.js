@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    var date_input = $('input[name="date"]'); //our date input has the name "date"
+    var date_input = $('input[name="dateCal"]');
     var container = "body";
     var options = {
         format: 'mm/dd/yyyy',
@@ -8,4 +8,4 @@
         autoclose: true,
     };
     date_input.datepicker(options);
-})
+});

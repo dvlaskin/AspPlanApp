@@ -1,0 +1,128 @@
+﻿@model AspPlanApp.Models.ReservViewModels.OrgDateViewModel
+@{
+    ViewBag.Title = "Calendar of Company";
+    Layout = "_Layout";
+}
+
+
+@section Styles
+{
+    <link rel="stylesheet" href="/lib/fullcalendar/core/main.min.css" />
+    <link rel="stylesheet" href="/lib/fullcalendar/daygrid/main.min.css" />
+    <link rel="stylesheet" href="/lib/fullcalendar/timegrid/main.min.css" />
+}
+
+<div class="container-fluid h-100">
+    <div class="header-margin">
+        <div style="text-align: center;">
+            <h2>@Model.orgName</h2>
+        </div>
+        <div id="calendar" orgId="@Model.orgId" dateCal="@Model.dateCal"></div>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><span id="eventTitle"></span></h4>
+                </div>
+                <div class="modal-body">
+                    <p id="pDetails"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="/lib/fullcalendar/core/main.min.js"></script>
+    <script src="/lib/fullcalendar/interaction/main.min.js"></script>
+    <script src="/lib/fullcalendar/daygrid/main.min.js"></script>
+    <script src="/lib/fullcalendar/timegrid/main.min.js"></script>
+ 
+    <script>
+        
+        $(document).ready(function () {
+            var events = [];
+            var calDiv = $('#calendar');
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("GetReserv", "Api")",
+                data: {
+                    orgId: calDiv.attr('orgId'),
+                    dateCal: calDiv.attr('dateCal')
+                },
+                success: function(data) {
+                    $.each(data, function(i, v) {
+                        //console.log(v);
+                        events.push({
+                            title: 'test',
+                            description: v.comment,
+                            start: v.dateFrom,
+                            end: v.dateTo,
+                            color: '',
+                            allDay: false
+                        });
+                    });
+
+                    GenerateCalendar(events);
+                },
+                error: function(error) {
+                    alert('failed\r\n' + error);
+                }
+            });
+            
+            function GenerateCalendar(events) {
+
+                var calendarEl = document.getElementById('calendar');
+
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    contentHeight: 500,
+                    allDaySlot: false,
+                    plugins: [ 'interaction', 'dayGrid', 'timeGrid' ],
+                    defaultView: 'timeGridWeek',
+                    defaultDate: calendarEl.getAttribute('dateCal'),
+                    timeFormat: 'h(:mm)a',
+                    eventLimit: true,
+                    eventColor: '#FF6E40',
+                    firstHour: 9,
+                    firstDay: 1,
+                    minTime: '09:00:00',
+                    maxTime: '19:00:00',
+                    businessHours: {
+                        daysOfWeek: [ 1, 2, 3, 4, 5, 6, 0 ], 
+
+                        startTime: '10:00',
+                        endTime: '18:00'
+                    },
+                    header: {
+                        left: 'prev today next',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: events,
+                    eventClick: function(calEvent) {
+                        //console.log(calEvent);
+                        $('#myModal #eventTitle').text(calEvent.event.title);
+                        var $description = $('<div/>');
+                        $description.append($('<p/>')
+                            .html('<b>Start:</b>' + calEvent.event.start.toLocaleString("en-US")));
+                        if (calEvent.event.end != null) {
+                            $description.append($('<p/>')
+                                .html('<b>End:</b>' + calEvent.event.end.toLocaleString("en-US")));
+                        }
+                        $description.append($('<p/>').html('<b>Description:</b>' + calEvent.event.extendedProps.description));
+                        $('#myModal #pDetails').empty().html($description);
+
+                        $('#myModal').modal();
+                    }
+                });
+
+                calendar.render();
+            }
+        })
+    </script>
+}

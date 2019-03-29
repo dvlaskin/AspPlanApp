@@ -343,6 +343,20 @@ li {
     border: none;
 }
 
+/* Full Calendar */
+
+.fc-button-primary {
+    color: #fff;
+    background-color: #7643ea;
+    border-color: transparent;
+    box-shadow: 5px 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.fc-button-primary:hover {
+    background-color: #FF6E40;
+    border-color: transparent;
+}
+
 /* Welcome Area CSS */
 
 .planapp-welcome-area {

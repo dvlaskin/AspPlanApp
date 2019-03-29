@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AspPlanApp.Models;
@@ -18,6 +19,8 @@ namespace AspPlanApp.Controllers
         private AppDbContext _dbContext;
         private IConfiguration _config;
         private DbOrgServ _dbOrgServ;
+        private DbOrgReservServ _dbOrgReservServ;
+        
         
         public ApiController(
             UserManager<User> userManager, 
@@ -38,6 +41,9 @@ namespace AspPlanApp.Controllers
         {
             if (_dbOrgServ == null)
                 _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
+            
+            if (_dbOrgReservServ == null)
+                _dbOrgReservServ = new DbOrgReservServ(_dbContext, _config, _userManager, _roleManager);
         }
 
         /// <summary>
@@ -68,6 +74,22 @@ namespace AspPlanApp.Controllers
             }
 
             return Json(orgInfo);
+        }
+
+        /// <summary>
+        /// Получить перечень зарезервированных событий организации на неделе от даты
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="dateCal"></param>
+        /// <returns></returns>
+        public async Task<JsonResult> GetReserv(int orgId, DateTime dateCal)
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+
+            var result = await DbOrgReservServ.GetOrgReservByWeek(orgId, dateCal, userId);
+            
+            return Json(result);
         }
     }
 }
