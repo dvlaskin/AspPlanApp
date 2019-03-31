@@ -44,8 +44,10 @@ namespace AspPlanApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> OrgCalendar(int OrgId = 0, DateTime dateCal = default(DateTime))
+        public async Task<IActionResult> OrgCalendar(int OrgId, DateTime dateCal)
         {
+            if (OrgId == 0 || dateCal == DateTime.MinValue) return RedirectToAction("Index", "Home"); 
+            
             Models.DbModels.Org orgInfo = await DbOrgServ.GetOrgByIdAsync(OrgId);
             string orgName = string.Empty;
             if (orgInfo != null)

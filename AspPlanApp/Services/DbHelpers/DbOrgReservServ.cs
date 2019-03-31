@@ -37,22 +37,12 @@ namespace AspPlanApp.Services.DbHelpers
         public static async Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser)
         {
             List<ReservItemsViewModel> result = new List<ReservItemsViewModel>();
-            
-            DateTime dateFrom = DateTime.Now;
-            DateTime dateTo = DateTime.Now;
-            
-            int dayOfWeek = (int)dateCal.DayOfWeek;
 
-            if (dayOfWeek == 1)
-            {
-                dateFrom = dateCal;
-            }
-            else
-            {
-                dateFrom = dateCal.AddDays(dayOfWeek - (dayOfWeek + 1));
-            }
+            if (orgId == 0 || dateCal == DateTime.MinValue)
+                return result;
             
-            dateTo = dateFrom.AddDays(6);
+            DateTime dateFrom = new DateTime(dateCal.Year, dateCal.Month, 1);;
+            DateTime dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
             await Task.Run(async () =>
             {

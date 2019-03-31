@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using AspPlanApp.Models;
@@ -8,6 +9,7 @@ using AspPlanApp.Models.ManageUsersViewModels;
 using AspPlanApp.Services.DbHelpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Controllers
@@ -84,6 +86,11 @@ namespace AspPlanApp.Controllers
         /// <returns></returns>
         public async Task<JsonResult> GetReserv(int orgId, DateTime dateCal)
         {
+            if (orgId == 0 || dateCal == DateTime.MinValue)
+            {
+                return null;
+            }
+            
             var user = User;
             string userId = _userManager.GetUserId(user);
 
