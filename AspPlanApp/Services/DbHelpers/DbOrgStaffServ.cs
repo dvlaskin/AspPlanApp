@@ -169,5 +169,15 @@ namespace AspPlanApp.Services.DbHelpers
                 
             return await DbOrgServ.GetOrgByIdAsync(orgId);
         }
+
+        /// <summary>
+        /// Get Staff by Organization
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        public static async Task<OrgStaff[]> GetOrgStaffByOrgId(int orgId)
+        {
+            return await _dbContext.OrgStaff.Where(w => w.orgId == orgId).ToArrayAsync();
+        }
     }
 }

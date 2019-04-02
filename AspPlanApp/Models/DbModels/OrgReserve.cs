@@ -15,6 +15,5 @@ namespace AspPlanApp.Models.DbModels
         public DateTime dateTo { get; set; }
         public bool isConfirm { get; set; }
         public string Comment { get; set; }
-        public string ownerId { get; set; }
     }
 }

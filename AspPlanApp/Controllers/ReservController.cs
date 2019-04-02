@@ -20,6 +20,7 @@ namespace AspPlanApp.Controllers
         private AppDbContext _dbContext;
         private IConfiguration _config;
         private DbOrgServ _dbOrgServ;
+        private DbOrgStaffServ _dbOrgStaffServ;
         
         
         public ReservController(
@@ -41,6 +42,9 @@ namespace AspPlanApp.Controllers
         {
             if (_dbOrgServ == null)
                 _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
+            
+            if (_dbOrgStaffServ == null)
+                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
         }
 
         [HttpGet]
@@ -55,7 +59,29 @@ namespace AspPlanApp.Controllers
                 orgName = orgInfo.orgName;
             }
             
-            return View(new OrgDateViewModel() { orgId = OrgId, dateCal = dateCal, orgName = orgName });
+            List<StaffInfo> staffInfo = new List<StaffInfo>();
+
+            var orgStaff = await DbOrgStaffServ.GetOrgStaffByOrgId(OrgId);
+            if (orgStaff.Length > 0)
+            {
+                foreach (var staff in orgStaff)
+                {
+                    var staffUser = await _userManager.FindByIdAsync(staff.staffId);
+                    staffInfo.Add(new StaffInfo()
+                    {
+                        orgStaffId = staff.orgStaffId,
+                        staffName = staffUser.UserName
+                    });
+                }
+            }
+            
+            return View(new OrgDateViewModel()
+            {
+                orgId = OrgId, 
+                dateCal = dateCal, 
+                orgName = orgName,
+                staffInfo = staffInfo.ToArray()
+            });
         }
 
     }

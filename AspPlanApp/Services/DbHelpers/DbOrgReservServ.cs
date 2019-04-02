@@ -67,7 +67,7 @@ namespace AspPlanApp.Services.DbHelpers
                         left join org on org.orgId = cl.orgId
                         left join orgStaff st on st.orgStaffId = cl.orgStaffId
                         left join user fn on fn.id = st.staffId 
-						left join user ow on ow.id = cl.ownerId	
+						left join user ow on ow.id = org.owner	
                         where cl.orgId = @orgId 
                             and dateFrom between @dateFrom and @dateTo
                     ";
