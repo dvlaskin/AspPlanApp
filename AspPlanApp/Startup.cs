@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AspPlanApp.Models;
 using AspPlanApp.Models.DbModels;
 using AspPlanApp.Services;
+using AspPlanApp.Services.DbHelpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -46,6 +47,11 @@ namespace AspPlanApp
                 .AddEntityFrameworkStores<AppDbContext>();
 
             services.AddTransient<IEmailSender, EmailSender>();
+            
+            // db services
+            services.AddScoped<IDbOrg, DbOrg>();
+            services.AddScoped<IDbCategory, DbCategory>();
+            services.AddScoped<IDbOrgReserv, DbOrgReserv>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

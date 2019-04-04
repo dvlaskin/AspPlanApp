@@ -17,36 +17,21 @@ namespace AspPlanApp.Controllers
     public class ApiController : Controller
     {
         private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private DbOrgServ _dbOrgServ;
-        private DbOrgReservServ _dbOrgReservServ;
+        private IDbOrgReserv _dbOrgReserv;
+        private readonly IDbOrg _dbOrg;
         
         
         public ApiController(
             UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManger,
-            AppDbContext dbContext,
-            IConfiguration config
+            IDbOrg dbOrg,
+            IDbOrgReserv dbOrgReserv
         )
         {
             _userManager = userManager;
-            _roleManager = roleManger;
-            _dbContext = dbContext;
-            _config = config;
-
-            DbServInitialization();
+            _dbOrg = dbOrg;
+            _dbOrgReserv = dbOrgReserv;
         }
         
-        private void DbServInitialization()
-        {
-            if (_dbOrgServ == null)
-                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-            
-            if (_dbOrgReservServ == null)
-                _dbOrgReservServ = new DbOrgReservServ(_dbContext, _config, _userManager, _roleManager);
-        }
 
         /// <summary>
         /// Поиск организации по названию
@@ -57,7 +42,7 @@ namespace AspPlanApp.Controllers
         [HttpGet]
         public async Task<JsonResult> SearchOrgByName(string strOrg, int catId=0)
         {
-            var orgArray = await DbOrgServ.SearchOrgName(strOrg);
+            var orgArray = await _dbOrg.SearchOrgName(strOrg);
             if (catId != 0)
             {
                 orgArray = orgArray.Where(w => w.category == catId).ToArray();
@@ -94,7 +79,7 @@ namespace AspPlanApp.Controllers
             var user = User;
             string userId = _userManager.GetUserId(user);
 
-            var result = await DbOrgReservServ.GetOrgReservByWeek(orgId, dateCal, userId);
+            var result = await _dbOrgReserv.GetOrgReservByWeek(orgId, dateCal, userId);
             
             return Json(result);
         }

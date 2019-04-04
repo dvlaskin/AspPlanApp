@@ -25,15 +25,17 @@ namespace AspPlanApp.Controllers
         private AppDbContext _dbContext;
         private IConfiguration _config;
         private DbUsersServ _dbUsersServ;
-        private DbOrgServ _dbOrgServ;
+        private IDbOrg _dbOrg;
         private DbOrgStaffServ _dbOrgStaffServ;
-        private DbCategoryServ _dbCategoryServ;
+        private IDbCategory _dbCategory;
 
         public ManageUsersController(
             UserManager<User> userManager, 
             RoleManager<IdentityRole> roleManger,
             AppDbContext dbContext,
-            IConfiguration config
+            IConfiguration config,
+            IDbOrg dbOrg,
+            IDbCategory dbCategory
             
         )
         {
@@ -41,22 +43,9 @@ namespace AspPlanApp.Controllers
             _roleManager = roleManger;
             _dbContext = dbContext;
             _config = config;
-
-            DbServInitialization();
+            _dbOrg = dbOrg;
+            _dbCategory = dbCategory;
         }
-        
-        private void DbServInitialization()
-        {
-            if (_dbUsersServ == null)
-                _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbOrgServ == null)
-                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbOrgStaffServ == null)
-                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-            if (_dbCategoryServ == null)
-                _dbCategoryServ = new DbCategoryServ(_dbContext);
-        }
-        
         
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -95,7 +84,7 @@ namespace AspPlanApp.Controllers
             }
            
             EditOwnerViewModel viewModel = await DbUsersServ.GetOwnerInfoAsync(owner);
-            ViewBag.CatList = await DbCategoryServ.GetCatListAsync();
+            ViewBag.CatList = await _dbCategory.GetCatListAsync();
            
             return View(viewModel);
         }
@@ -119,7 +108,7 @@ namespace AspPlanApp.Controllers
 
                 foreach (var orgItem in model.Orgs)
                 {
-                    var updOrgResult = await DbOrgServ.OrgUpdateAsync(orgItem);
+                    var updOrgResult = await _dbOrg.OrgUpdateAsync(orgItem);
                     if (!updOrgResult.isSuccess)
                     {
                         foreach (var err in updOrgResult.errors)
@@ -247,7 +236,7 @@ namespace AspPlanApp.Controllers
         {
             var user =  await _userManager.GetUserAsync(User);
             model.owner = user.Id;
-            await DbOrgServ.AddNewOrg(model);
+            await _dbOrg.AddNewOrg(model);
             return RedirectToAction(nameof(EditOwner), "ManageUsers", new { id = user.Id });
         }
         
@@ -291,7 +280,7 @@ namespace AspPlanApp.Controllers
             bool result = false;
             var user = await _userManager.GetUserAsync(User);
 
-            result = await DbOrgServ.DeleteOrg(user.Id, orgId);
+            result = await _dbOrg.DeleteOrg(user.Id, orgId);
 
             return Json(new { result = result});
         }
@@ -299,7 +288,7 @@ namespace AspPlanApp.Controllers
         [HttpGet]
         public async Task<JsonResult> SearchOrgByName(string strOrg)
         {
-            var orgArray = await DbOrgServ.SearchOrgName(strOrg);
+            var orgArray = await _dbOrg.SearchOrgName(strOrg);
             List<SearchOrgViewModel> orgInfo = new List<SearchOrgViewModel>();
             foreach (var item in orgArray)
             {

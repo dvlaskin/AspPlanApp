@@ -16,25 +16,21 @@ using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class DbOrgReservServ
+    public class DbOrgReserv : IDbOrgReserv
     {
         private static AppDbContext _dbContext;
         private static IConfiguration _config;
-        private static UserManager<User> _userManager;
-        private static RoleManager<IdentityRole> _roleManager;
 
-        public DbOrgReservServ(AppDbContext dbContext,
+        public DbOrgReserv(AppDbContext dbContext,
             IConfiguration config,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManger)
         {
             _dbContext = dbContext;
             _config = config;
-            _userManager = userManager;
-            _roleManager = roleManger;
         }
 
-        public static async Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser)
+        public async Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser)
         {
             List<ReservItemsViewModel> result = new List<ReservItemsViewModel>();
 
@@ -92,5 +88,6 @@ namespace AspPlanApp.Services.DbHelpers
             return result;
 
         }
+        
     }
 }

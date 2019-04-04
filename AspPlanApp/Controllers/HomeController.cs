@@ -13,29 +13,17 @@ namespace AspPlanApp.Controllers
     public class HomeController : Controller
     {
         private AppDbContext _dbContext;
-        private DbCategoryServ _dbCategoryServ;
+        private IDbCategory _dbCategory;
         
-        public HomeController(AppDbContext dbContext)
+        public HomeController(AppDbContext dbContext, IDbCategory dbCategory)
         {
             _dbContext = dbContext;
-            
-            DbServInitialization();
-        }
-        
-        private void DbServInitialization()
-        {
-//            _dbUsersServ = new DbUsersServ(_dbContext, _config, _userManager, _roleManager);
-//            _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-//            _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-            
-            if (_dbCategoryServ == null)
-            _dbCategoryServ = new DbCategoryServ(_dbContext);
-            
+            _dbCategory = dbCategory;
         }
 
         public async Task<IActionResult> Index()
         {
-            ViewBag.Categories = await DbCategoryServ.GetCatListAsync();
+            ViewBag.Categories = await _dbCategory.GetCatListAsync();
             
             return View();
         }

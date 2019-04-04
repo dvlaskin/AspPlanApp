@@ -20,8 +20,10 @@ namespace AspPlanApp.Services.DbHelpers
         private static IConfiguration _config;
         private static UserManager<User> _userManager;
         private static RoleManager<IdentityRole> _roleManager;
+        private static IDbOrg _dbOrg;
 
         public DbUsersServ(AppDbContext dbContext, 
+            IDbOrg dbOrg,
             IConfiguration config,
             UserManager<User> userManager, 
             RoleManager<IdentityRole> roleManger)
@@ -30,6 +32,8 @@ namespace AspPlanApp.Services.DbHelpers
             _config = config;
             _userManager = userManager;
             _roleManager = roleManger;
+
+            _dbOrg = dbOrg;
         }
         
         /// <summary>
@@ -54,7 +58,7 @@ namespace AspPlanApp.Services.DbHelpers
                     ConfirmNewPassword = string.Empty
                 };
               
-                result.Orgs = DbOrgServ.GetOrgsByOwner(user.Id);
+                result.Orgs = _dbOrg.GetOrgsByOwner(user.Id);
                 
                 ConnectionDb conn = new ConnectionDb(_config);
 

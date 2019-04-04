@@ -1,44 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using AspPlanApp.Data;
 using AspPlanApp.Models;
 using AspPlanApp.Models.DbModels;
-using AspPlanApp.Models.ManageUsersViewModels;
-using Dapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-
 
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class DbOrgServ
+    public class DbOrg : IDbOrg
     {
-        private static AppDbContext _dbContext;
-        private static IConfiguration _config;
-        private static UserManager<User> _userManager;
-        private static RoleManager<IdentityRole> _roleManager;
+        private readonly AppDbContext _dbContext;
 
-        public DbOrgServ(AppDbContext dbContext,
-            IConfiguration config,
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManger)
+        public DbOrg(AppDbContext dbContext)
         {
             _dbContext = dbContext;
-            _config = config;
-            _userManager = userManager;
-            _roleManager = roleManger;
         }
-        
 
         /// <summary>
         /// Update Organization
         /// </summary>
         /// <param name="updOrg">object with new organization info</param>
         /// <returns></returns>
-        public static async Task<(bool isSuccess, IEnumerable<string> errors)> OrgUpdateAsync(IEditOrg updOrg)
+        public async Task<(bool isSuccess, IEnumerable<string> errors)> OrgUpdateAsync(IEditOrg updOrg)
         {
             var result = (isSuccess: false, errors: new List<string>());
             
@@ -85,7 +68,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="updOrg">org with new data</param>
         /// <param name="sourceOrg">org with old data which will be changed</param>
         /// <returns></returns>
-        private static bool CompareOrgs(IEditOrg updOrg, ref Models.DbModels.Org sourceOrg)
+        public bool CompareOrgs(IEditOrg updOrg, ref Models.DbModels.Org sourceOrg)
         {
             bool result = false;
 
@@ -139,7 +122,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        public static async Task<Models.DbModels.Org> GetOrgByIdAsync(int orgId)
+        public async Task<Models.DbModels.Org> GetOrgByIdAsync(int orgId)
         {
             return await _dbContext.Org.Where(w => w.orgId == orgId).FirstOrDefaultAsync();
         }
@@ -149,7 +132,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="ownerId">owner userId</param>
         /// <returns></returns>
-        public static List<Models.DbModels.Org> GetOrgsByOwner(string ownerId)
+        public List<Models.DbModels.Org> GetOrgsByOwner(string ownerId)
         {
             return _dbContext.Org.Where(w => w.owner == ownerId).ToList();
         }
@@ -159,7 +142,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="strOrgName"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<Models.DbModels.Org>> SearchOrgName(string strOrgName)
+        public async Task<IEnumerable<Models.DbModels.Org>> SearchOrgName(string strOrgName)
         {
             return await _dbContext.Org
                 .Where( w => w.orgName.ToLower().Contains(strOrgName.ToLower()) )
@@ -172,7 +155,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="org"></param>
         /// <returns></returns>
-        public static async Task<bool> AddNewOrg(Models.DbModels.Org org)
+        public async Task<bool> AddNewOrg(Models.DbModels.Org org)
         {
             await _dbContext.Org.AddAsync(org);
             var result = await _dbContext.SaveChangesAsync();
@@ -186,7 +169,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="userId"></param>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        public static async Task<bool> DeleteOrg(string userId, int orgId)
+        public async Task<bool> DeleteOrg(string userId, int orgId)
         {
             bool result = false;
 
@@ -213,6 +196,5 @@ namespace AspPlanApp.Services.DbHelpers
 
             return result;
         }
-        
     }
 }

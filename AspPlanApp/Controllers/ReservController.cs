@@ -15,44 +15,27 @@ namespace AspPlanApp.Controllers
 {
     public class ReservController : Controller
     {
-        private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private DbOrgServ _dbOrgServ;
+        private readonly UserManager<User> _userManager;
+        private IDbOrg _dbOrg;
         private DbOrgStaffServ _dbOrgStaffServ;
         
         
         public ReservController(
             UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManger,
-            AppDbContext dbContext,
-            IConfiguration config
+            IDbOrg dbOrg
         )
         {
             _userManager = userManager;
-            _roleManager = roleManger;
-            _dbContext = dbContext;
-            _config = config;
-
-            DbServInitialization();
+            _dbOrg = dbOrg;
         }
         
-        private void DbServInitialization()
-        {
-            if (_dbOrgServ == null)
-                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-            
-            if (_dbOrgStaffServ == null)
-                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-        }
 
         [HttpGet]
         public async Task<IActionResult> OrgCalendar(int OrgId, DateTime dateCal)
         {
             if (OrgId == 0 || dateCal == DateTime.MinValue) return RedirectToAction("Index", "Home"); 
             
-            Models.DbModels.Org orgInfo = await DbOrgServ.GetOrgByIdAsync(OrgId);
+            Models.DbModels.Org orgInfo = await _dbOrg.GetOrgByIdAsync(OrgId);
             string orgName = string.Empty;
             if (orgInfo != null)
             {

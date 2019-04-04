@@ -14,8 +14,10 @@ namespace AspPlanApp.Services.DbHelpers
         private static IConfiguration _config;
         private static UserManager<User> _userManager;
         private static RoleManager<IdentityRole> _roleManager;
+        private static IDbOrg _dbOrg;
 
-        public DbOrgStaffServ(AppDbContext dbContext,
+        public DbOrgStaffServ(AppDbContext dbContext, 
+            IDbOrg dbOrg,
             IConfiguration config,
             UserManager<User> userManager,
             RoleManager<IdentityRole> roleManger)
@@ -24,6 +26,8 @@ namespace AspPlanApp.Services.DbHelpers
             _config = config;
             _userManager = userManager;
             _roleManager = roleManger;
+
+            _dbOrg = dbOrg;
         }
         
 
@@ -89,7 +93,7 @@ namespace AspPlanApp.Services.DbHelpers
         {
             bool result = false;
 
-            Models.DbModels.Org org = await DbOrgServ.GetOrgByIdAsync(orgId);
+            Models.DbModels.Org org = await _dbOrg.GetOrgByIdAsync(orgId);
 
             if (org.owner != ownerId) 
                 return result;
@@ -119,7 +123,7 @@ namespace AspPlanApp.Services.DbHelpers
         {
             bool result = false;
 
-            Models.DbModels.Org org = await DbOrgServ.GetOrgByIdAsync(orgId);
+            Models.DbModels.Org org = await _dbOrg.GetOrgByIdAsync(orgId);
 
             if (org.owner != ownerId) 
                 return result;
@@ -167,7 +171,7 @@ namespace AspPlanApp.Services.DbHelpers
 
             if (orgId == 0) return null;
                 
-            return await DbOrgServ.GetOrgByIdAsync(orgId);
+            return await _dbOrg.GetOrgByIdAsync(orgId);
         }
 
         /// <summary>
