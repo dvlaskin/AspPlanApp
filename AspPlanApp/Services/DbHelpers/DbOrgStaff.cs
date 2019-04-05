@@ -8,36 +8,25 @@ using Microsoft.Extensions.Configuration;
 
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class DbOrgStaffServ
+    public class DbOrgStaff : IDbOrgStaff
     {
-        private static AppDbContext _dbContext;
-        private static IConfiguration _config;
-        private static UserManager<User> _userManager;
-        private static RoleManager<IdentityRole> _roleManager;
-        private static IDbOrg _dbOrg;
+        private readonly AppDbContext _dbContext;
+        private readonly IDbOrg _dbOrg;
 
-        public DbOrgStaffServ(AppDbContext dbContext, 
-            IDbOrg dbOrg,
-            IConfiguration config,
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManger)
+        public DbOrgStaff(AppDbContext dbContext, IDbOrg dbOrg)
         {
             _dbContext = dbContext;
-            _config = config;
-            _userManager = userManager;
-            _roleManager = roleManger;
-
             _dbOrg = dbOrg;
         }
         
-
+        
         /// <summary>
         /// Add new staff in OrgStaff table
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        private static async Task<bool> AddNewStaff(string userId, int orgId)
+        public async Task<bool> AddNewStaff(string userId, int orgId)
         {
             OrgStaff orgStaff = new OrgStaff()
             {
@@ -58,7 +47,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="userId"></param>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        public static async Task<bool> ChangeOrgForStaff(string userId, int orgId)
+        public async Task<bool> ChangeOrgForStaff(string userId, int orgId)
         {
             bool result = false;
 
@@ -89,7 +78,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="orgId"></param>
         /// <param name="staffId"></param>
         /// <returns></returns>
-        public static async Task<bool> RemoveStaffFromOrgAsync(string ownerId, int orgId, string staffId)
+        public async Task<bool> RemoveStaffFromOrgAsync(string ownerId, int orgId, string staffId)
         {
             bool result = false;
 
@@ -119,7 +108,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="orgId"></param>
         /// <param name="staffId"></param>
         /// <returns></returns>
-        public static async Task<bool> ConfirmNewStaffAsync(string ownerId, int orgId, string staffId)
+        public async Task<bool> ConfirmNewStaffAsync(string ownerId, int orgId, string staffId)
         {
             bool result = false;
 
@@ -150,7 +139,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="orgId"></param>
         /// <param name="staffId"></param>
         /// <returns></returns>
-        public static async Task<OrgStaff> GetOrgStaffAsync(int orgId, string staffId)
+        public async Task<OrgStaff> GetOrgStaffAsync(int orgId, string staffId)
         {
             return await _dbContext.OrgStaff
                 .Where(w => w.orgId == orgId && w.staffId == staffId)
@@ -162,7 +151,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="staffId"></param>
         /// <returns></returns>
-        public static async Task<Models.DbModels.Org> GetOrgByStaffIdAsync(string staffId)
+        public async Task<Models.DbModels.Org> GetOrgByStaffIdAsync(string staffId)
         {
             int orgId = await _dbContext.OrgStaff
                 .Where(w => w.staffId == staffId)
@@ -179,7 +168,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        public static async Task<OrgStaff[]> GetOrgStaffByOrgId(int orgId)
+        public async Task<OrgStaff[]> GetOrgStaffByOrgId(int orgId)
         {
             return await _dbContext.OrgStaff.Where(w => w.orgId == orgId).ToArrayAsync();
         }

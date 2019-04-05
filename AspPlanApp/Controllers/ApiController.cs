@@ -16,8 +16,8 @@ namespace AspPlanApp.Controllers
 {
     public class ApiController : Controller
     {
-        private UserManager<User> _userManager;
-        private IDbOrgReserv _dbOrgReserv;
+        private readonly UserManager<User> _userManager;
+        private readonly IDbOrgReserv _dbOrgReserv;
         private readonly IDbOrg _dbOrg;
         
         

@@ -6,7 +6,7 @@ namespace AspPlanApp.Services.DbHelpers
 {
     public class DbCategory : IDbCategory
     {
-        private static AppDbContext _dbContext;
+        private readonly AppDbContext _dbContext;
         
         public DbCategory(AppDbContext dbContext)
         {

@@ -16,17 +16,19 @@ namespace AspPlanApp.Controllers
     public class ReservController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private IDbOrg _dbOrg;
-        private DbOrgStaffServ _dbOrgStaffServ;
+        private readonly IDbOrg _dbOrg;
+        private readonly IDbOrgStaff _dbOrgStaff;
         
         
         public ReservController(
             UserManager<User> userManager, 
-            IDbOrg dbOrg
+            IDbOrg dbOrg,
+            IDbOrgStaff dbOrgStaff
         )
         {
             _userManager = userManager;
             _dbOrg = dbOrg;
+            _dbOrgStaff = dbOrgStaff;
         }
         
 
@@ -44,7 +46,7 @@ namespace AspPlanApp.Controllers
             
             List<StaffInfo> staffInfo = new List<StaffInfo>();
 
-            var orgStaff = await DbOrgStaffServ.GetOrgStaffByOrgId(OrgId);
+            var orgStaff = await _dbOrgStaff.GetOrgStaffByOrgId(OrgId);
             if (orgStaff.Length > 0)
             {
                 foreach (var staff in orgStaff)

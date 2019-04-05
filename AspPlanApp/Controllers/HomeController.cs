@@ -12,12 +12,10 @@ namespace AspPlanApp.Controllers
 {
     public class HomeController : Controller
     {
-        private AppDbContext _dbContext;
-        private IDbCategory _dbCategory;
+        private readonly IDbCategory _dbCategory;
         
-        public HomeController(AppDbContext dbContext, IDbCategory dbCategory)
+        public HomeController(IDbCategory dbCategory)
         {
-            _dbContext = dbContext;
             _dbCategory = dbCategory;
         }
 

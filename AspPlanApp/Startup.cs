@@ -52,6 +52,8 @@ namespace AspPlanApp
             services.AddScoped<IDbOrg, DbOrg>();
             services.AddScoped<IDbCategory, DbCategory>();
             services.AddScoped<IDbOrgReserv, DbOrgReserv>();
+            services.AddScoped<IDbOrgStaff, DbOrgStaff>();
+            services.AddScoped<IDbUsers, DbUsers>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

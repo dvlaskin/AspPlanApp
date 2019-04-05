@@ -11,28 +11,21 @@ using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 
-
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class DbUsersServ
+    public class DbUsers : IDbUsers
     {
-        private static AppDbContext _dbContext;
-        private static IConfiguration _config;
-        private static UserManager<User> _userManager;
-        private static RoleManager<IdentityRole> _roleManager;
-        private static IDbOrg _dbOrg;
+        private readonly IConfiguration _config;
+        private readonly UserManager<User> _userManager;
+        private readonly IDbOrg _dbOrg;
 
-        public DbUsersServ(AppDbContext dbContext, 
+        public DbUsers(
             IDbOrg dbOrg,
             IConfiguration config,
-            UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManger)
+            UserManager<User> userManager)
         {
-            _dbContext = dbContext;
             _config = config;
             _userManager = userManager;
-            _roleManager = roleManger;
-
             _dbOrg = dbOrg;
         }
         
@@ -42,7 +35,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static async Task<EditOwnerViewModel> GetOwnerInfoAsync(User user)
+        public async Task<EditOwnerViewModel> GetOwnerInfoAsync(User user)
         {
             if (user == null) return null;
 
@@ -95,7 +88,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// </summary>
         /// <param name="updUser">client role object with new data</param>
         /// <returns></returns>
-        public static async Task<(bool isSuccess, IEnumerable<string> errors)> ClientUpdateAsync(IEditClient updUser)
+        public async Task<(bool isSuccess, IEnumerable<string> errors)> ClientUpdateAsync(IEditClient updUser)
         {
 
             var result = (isSuccess: false, errors: new List<string>());
@@ -172,7 +165,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="updUser">client with new data</param>
         /// <param name="user">client with old data which will be changed</param>
         /// <returns></returns>
-        private static bool CompareUsers(IEditClient updUser, ref User user)
+        private bool CompareUsers(IEditClient updUser, ref User user)
         {
             bool result = false;
 
@@ -195,7 +188,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// Get User List with short info
         /// </summary>
         /// <returns></returns>
-        public static async Task<List<UsersListViewModel>> GetUserListAsync()
+        public async Task<List<UsersListViewModel>> GetUserListAsync()
         {
 
             return await Task.Run(async () =>
@@ -223,6 +216,5 @@ namespace AspPlanApp.Services.DbHelpers
                 return result;
             });
         }
-
     }
 }

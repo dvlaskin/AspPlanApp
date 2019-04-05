@@ -18,15 +18,10 @@ namespace AspPlanApp.Services.DbHelpers
 {
     public class DbOrgReserv : IDbOrgReserv
     {
-        private static AppDbContext _dbContext;
-        private static IConfiguration _config;
+        private readonly IConfiguration _config;
 
-        public DbOrgReserv(AppDbContext dbContext,
-            IConfiguration config,
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManger)
+        public DbOrgReserv(IConfiguration config)
         {
-            _dbContext = dbContext;
             _config = config;
         }
 

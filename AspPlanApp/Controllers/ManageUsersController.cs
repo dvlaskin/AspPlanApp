@@ -20,31 +20,26 @@ namespace AspPlanApp.Controllers
     [Authorize]
     public class ManageUsersController : Controller
     {
-        private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private DbUsersServ _dbUsersServ;
-        private IDbOrg _dbOrg;
-        private DbOrgStaffServ _dbOrgStaffServ;
-        private IDbCategory _dbCategory;
+        private readonly UserManager<User> _userManager;
+        private readonly IDbUsers _dbUsers;
+        private readonly IDbOrg _dbOrg;
+        private readonly IDbOrgStaff _dbOrgStaff;
+        private readonly IDbCategory _dbCategory;
 
         public ManageUsersController(
             UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManger,
-            AppDbContext dbContext,
-            IConfiguration config,
             IDbOrg dbOrg,
-            IDbCategory dbCategory
+            IDbCategory dbCategory,
+            IDbOrgStaff dbOrgStaff,
+            IDbUsers dbUsers
             
         )
         {
             _userManager = userManager;
-            _roleManager = roleManger;
-            _dbContext = dbContext;
-            _config = config;
             _dbOrg = dbOrg;
             _dbCategory = dbCategory;
+            _dbOrgStaff = dbOrgStaff;
+            _dbUsers = dbUsers;
         }
         
         [HttpGet]
@@ -56,7 +51,7 @@ namespace AspPlanApp.Controllers
            
             if (user.IsInRole(AppRoles.Admin))
             {
-                return View(await DbUsersServ.GetUserListAsync());
+                return View(await _dbUsers.GetUserListAsync());
             }
             else if (user.IsInRole(AppRoles.Owner))
             {
@@ -83,7 +78,7 @@ namespace AspPlanApp.Controllers
                 return NotFound();
             }
            
-            EditOwnerViewModel viewModel = await DbUsersServ.GetOwnerInfoAsync(owner);
+            EditOwnerViewModel viewModel = await _dbUsers.GetOwnerInfoAsync(owner);
             ViewBag.CatList = await _dbCategory.GetCatListAsync();
            
             return View(viewModel);
@@ -94,7 +89,7 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
+                var updClientResult = await _dbUsers.ClientUpdateAsync(model);
 
                 if (!updClientResult.isSuccess)
                 {
@@ -134,7 +129,7 @@ namespace AspPlanApp.Controllers
                 return NotFound();
             }
 
-            Models.DbModels.Org orgData = await DbOrgStaffServ.GetOrgByStaffIdAsync(user.Id);
+            Models.DbModels.Org orgData = await _dbOrgStaff.GetOrgByStaffIdAsync(user.Id);
             
             EditStaffViewModel model = new EditStaffViewModel()
             {
@@ -164,7 +159,7 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
+                var updClientResult = await _dbUsers.ClientUpdateAsync(model);
 
                 if (!updClientResult.isSuccess)
                 {
@@ -176,7 +171,7 @@ namespace AspPlanApp.Controllers
                     return View();
                 }
 
-                var updOrgResult = await DbOrgStaffServ.ChangeOrgForStaff(model.Id, model.OrgId);
+                var updOrgResult = await _dbOrgStaff.ChangeOrgForStaff(model.Id, model.OrgId);
                 if (!updOrgResult)
                 {
                     ModelState.AddModelError(string.Empty, "Company has not changed.");
@@ -213,7 +208,7 @@ namespace AspPlanApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var updClientResult = await DbUsersServ.ClientUpdateAsync(model);
+                var updClientResult = await _dbUsers.ClientUpdateAsync(model);
 
                 if (!updClientResult.isSuccess)
                 {
@@ -261,7 +256,7 @@ namespace AspPlanApp.Controllers
         {
             var user = User;
             string userId = _userManager.GetUserId(user);
-            bool removeResult = await DbOrgStaffServ.RemoveStaffFromOrgAsync(userId, orgId, staffId);
+            bool removeResult = await _dbOrgStaff.RemoveStaffFromOrgAsync(userId, orgId, staffId);
             return Json (new { result = removeResult });
         }
 
@@ -270,7 +265,7 @@ namespace AspPlanApp.Controllers
         {
             var user = User;
             string userId = _userManager.GetUserId(user);
-            bool removeResult = await DbOrgStaffServ.ConfirmNewStaffAsync(userId, orgId, staffId);
+            bool removeResult = await _dbOrgStaff.ConfirmNewStaffAsync(userId, orgId, staffId);
             return Json(new { result = removeResult });
         }
 
