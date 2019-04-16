@@ -11,5 +11,7 @@ namespace AspPlanApp.Services.DbHelpers
     public interface IDbOrgReserv
     {
         Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser);
+
+        Task AddNewEvent(string userId, int orgId, DateTime dateFrom, DateTime dateTo, int staffId, string comm);
     }
 }

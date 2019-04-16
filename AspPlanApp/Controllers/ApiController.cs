@@ -69,6 +69,7 @@ namespace AspPlanApp.Controllers
         /// <param name="orgId"></param>
         /// <param name="dateCal"></param>
         /// <returns></returns>
+        [HttpGet]
         public async Task<JsonResult> GetReserv(int orgId, DateTime dateCal)
         {
             if (orgId == 0 || dateCal == DateTime.MinValue)

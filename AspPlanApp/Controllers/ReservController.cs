@@ -18,24 +18,28 @@ namespace AspPlanApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IDbOrg _dbOrg;
         private readonly IDbOrgStaff _dbOrgStaff;
+        private readonly IDbOrgReserv _dbOrgReserv;
         
         
         public ReservController(
             UserManager<User> userManager, 
             IDbOrg dbOrg,
-            IDbOrgStaff dbOrgStaff
+            IDbOrgStaff dbOrgStaff,
+            IDbOrgReserv dbOrgReserv
         )
         {
             _userManager = userManager;
             _dbOrg = dbOrg;
             _dbOrgStaff = dbOrgStaff;
+            _dbOrgReserv = dbOrgReserv;
         }
         
 
         [HttpGet]
         public async Task<IActionResult> OrgCalendar(int OrgId, DateTime dateCal)
         {
-            if (OrgId == 0 || dateCal == DateTime.MinValue) return RedirectToAction("Index", "Home"); 
+            if (OrgId == 0 || dateCal == DateTime.MinValue) 
+                return RedirectToAction("Index", "Home"); 
             
             Models.DbModels.Org orgInfo = await _dbOrg.GetOrgByIdAsync(OrgId);
             string orgName = string.Empty;
@@ -68,6 +72,33 @@ namespace AspPlanApp.Controllers
                 staffInfo = staffInfo.ToArray()
             });
         }
+        
+        
+        [HttpPost]
+        public async Task<IActionResult> AddNewEvent(
+            int orgId,
+            DateTime dateFrom, 
+            DateTime dateTo, 
+            int staff, 
+            string comm)
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
 
+            if (
+                string.IsNullOrEmpty(userId) 
+                || orgId == 0 
+                || dateFrom == DateTime.MinValue 
+                || dateTo == DateTime.MinValue
+                )
+                return RedirectToAction("Login", "Account");
+
+            if (dateTo > dateFrom)
+            {
+                await _dbOrgReserv.AddNewEvent(userId, orgId, dateFrom, dateTo, staff, comm);
+            }
+                
+            return RedirectToAction("OrgCalendar", "Reserv", new { orgId, dateCal = dateFrom });
+        }
     }
 }

@@ -92,6 +92,15 @@ li {
     list-style: none;
 }
 
+.input_error {
+    color: red;
+    margin-left: 5px;
+}
+
+label.input_error {
+    display: inline;
+}
+
 
 .hide {
     display: none;

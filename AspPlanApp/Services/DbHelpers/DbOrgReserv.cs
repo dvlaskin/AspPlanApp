@@ -19,20 +19,30 @@ namespace AspPlanApp.Services.DbHelpers
     public class DbOrgReserv : IDbOrgReserv
     {
         private readonly IConfiguration _config;
+        private readonly AppDbContext _dbContext;
 
-        public DbOrgReserv(IConfiguration config)
+        public DbOrgReserv(IConfiguration config, AppDbContext dbContext)
         {
             _config = config;
+            _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Get all reserved events on week by the date
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="dateCal"></param>
+        /// <param name="currUser"></param>
+        /// <returns></returns>
         public async Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser)
         {
             List<ReservItemsViewModel> result = new List<ReservItemsViewModel>();
 
             if (orgId == 0 || dateCal == DateTime.MinValue)
                 return result;
-            
-            DateTime dateFrom = new DateTime(dateCal.Year, dateCal.Month, 1);;
+
+            DateTime dateFrom = new DateTime(dateCal.Year, dateCal.Month, 1);
+            ;
             DateTime dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
             await Task.Run(async () =>
@@ -67,11 +77,11 @@ namespace AspPlanApp.Services.DbHelpers
                     ConnectionDb.OpenConnect(sqlCon);
 
                     var resultQuery = await sqlCon.QueryAsync<ReservItemsViewModel>(
-                        query, 
+                        query,
                         new
                         {
-                            orgId = orgId, 
-                            dateFrom = dateFrom, 
+                            orgId = orgId,
+                            dateFrom = dateFrom,
                             dateTo = dateTo,
                             currUser = currUser
                         });
@@ -81,8 +91,40 @@ namespace AspPlanApp.Services.DbHelpers
             });
 
             return result;
-
         }
-        
+
+        /// <summary>
+        /// Add new reserve event to calendar of Company
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="orgId"></param>
+        /// <param name="dateFrom"></param>
+        /// <param name="dateTo"></param>
+        /// <param name="staffId"></param>
+        /// <param name="comm"></param>
+        /// <returns></returns>
+        public async Task AddNewEvent(
+            string userId,
+            int orgId,
+            DateTime dateFrom,
+            DateTime dateTo,
+            int staffId,
+            string comm
+        )
+        {
+            OrgReserve resNew = new OrgReserve()
+            {
+                orgId = orgId,
+                userId = userId,
+                orgStaffId = staffId,
+                dateFrom = dateFrom,
+                dateTo = dateTo,
+                isConfirm = false,
+                Comment = comm
+            };
+
+            await _dbContext.OrgReserve.AddAsync(resNew);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
