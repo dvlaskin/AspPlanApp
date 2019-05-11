@@ -42,7 +42,6 @@ namespace AspPlanApp.Services.DbHelpers
                 return result;
 
             DateTime dateFrom = new DateTime(dateCal.Year, dateCal.Month, 1);
-            ;
             DateTime dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
             await Task.Run(async () =>
@@ -103,14 +102,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// <param name="staffId"></param>
         /// <param name="comm"></param>
         /// <returns></returns>
-        public async Task AddNewEvent(
-            string userId,
-            int orgId,
-            DateTime dateFrom,
-            DateTime dateTo,
-            int staffId,
-            string comm
-        )
+        public async Task AddNewEvent(string userId,int orgId,DateTime dateFrom,DateTime dateTo,int staffId,string comm)
         {
             OrgReserve resNew = new OrgReserve()
             {
@@ -125,6 +117,75 @@ namespace AspPlanApp.Services.DbHelpers
 
             await _dbContext.OrgReserve.AddAsync(resNew);
             await _dbContext.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Get User calendar reserved items
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="dateCal">calendar date</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<UserCalendarViewModel>> GetUserCalendar(string userId, DateTime dateCal)
+        {
+            List<UserCalendarViewModel> result = new List<UserCalendarViewModel>();
+
+            if (string.IsNullOrEmpty(userId) || dateCal == DateTime.MinValue)
+                return result;
+            
+            DateTime dateFrom = new DateTime(dateCal.Year, dateCal.Month, 1);
+            DateTime dateTo = dateFrom.AddMonths(1).AddDays(-1);
+
+            await Task.Run(async () =>
+            {
+                ConnectionDb conn = new ConnectionDb(_config);
+
+                using (IDbConnection sqlCon = conn.GetConnection)
+                {
+                    string query = @"
+                        select
+                            cl.resId,
+                            case
+                                when ifnull(ow.id,'') = @userId then 1
+                                else 0
+                            end as isOwner,
+                            cl.orgId,
+                            ifnull(org.orgName,'') as orgName,
+                            ifnull(fn.userName,ow.userName) as staffName,
+                            cl.dateFrom,
+                            cl.dateTo,
+                            cl.isConfirm,
+                            cl.comment
+                        from orgReserve cl
+                        left join org on org.orgId = cl.orgId
+                        left join orgStaff st on st.orgStaffId = cl.orgStaffId
+                        left join user fn on fn.id = st.staffId 
+						left join user ow on ow.id = org.owner	
+                        where dateFrom between @dateFrom and @dateTo
+                            and (
+                                    ifnull(cl.userId,'') = @userId 
+                                    or ifnull(fn.id,'') = @userId 
+                                    or ifnull(ow.id,'') = @userId
+                                )
+                    ";
+
+                    // Ensure that the connection state is Open
+                    ConnectionDb.OpenConnect(sqlCon);
+
+                    var resultQuery = await sqlCon.QueryAsync<UserCalendarViewModel>(
+                        query,
+                        new
+                        {
+                            dateFrom = dateFrom,
+                            dateTo = dateTo,
+                            userId = userId
+                        });
+
+                    result = resultQuery.ToList();
+                }
+            });
+            
+            return result;
         }
     }
 }
