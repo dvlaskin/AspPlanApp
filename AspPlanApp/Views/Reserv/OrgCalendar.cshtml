@@ -134,7 +134,7 @@
                     },
                     success: function(data) {
                         $.each(data, function(i, v) {
-                            console.log(v);
+                            //console.log(v);
                             events.push({
                                 title: (v.isMy ? 'Your reserve ' : '') + ' Staff: ' + v.staffName,
                                 description: v.comment,
@@ -191,7 +191,7 @@
                                     window.location.href = "@Url.Action("Login", "Account")";
                                 }
                                 
-                                $('#addReserve').modal();;
+                                $('#addReserve').modal();
                             }
                         }
                     },

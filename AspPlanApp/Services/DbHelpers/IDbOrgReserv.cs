@@ -13,5 +13,7 @@ namespace AspPlanApp.Services.DbHelpers
         Task<List<ReservItemsViewModel>> GetOrgReservByWeek(int orgId, DateTime dateCal, string currUser);
 
         Task AddNewEvent(string userId, int orgId, DateTime dateFrom, DateTime dateTo, int staffId, string comm);
+
+        Task<List<UserCalendarViewModel>> GetUserCalendar(string userId, DateTime dateCal);
     }
 }

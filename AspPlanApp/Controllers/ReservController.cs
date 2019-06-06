@@ -72,15 +72,21 @@ namespace AspPlanApp.Controllers
                 staffInfo = staffInfo.ToArray()
             });
         }
-        
-        
+
+        [HttpGet]
+        public async Task<IActionResult> UserCalendar()
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+            
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
+            
+            return View();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> AddNewEvent(
-            int orgId,
-            DateTime dateFrom, 
-            DateTime dateTo, 
-            int staff, 
-            string comm)
+        public async Task<IActionResult> AddNewEvent(int orgId,DateTime dateFrom,DateTime dateTo,int staff,string comm)
         {
             var user = User;
             string userId = _userManager.GetUserId(user);
@@ -99,6 +105,16 @@ namespace AspPlanApp.Controllers
             }
                 
             return RedirectToAction("OrgCalendar", "Reserv", new { orgId, dateCal = dateFrom });
+        }
+
+        public async Task<IActionResult> ConfirmReserveEvent(int resId, string currDateString)
+        {
+            DateTime currDate = DateTime.Now;
+            DateTime.TryParse(currDateString, out currDate);
+            
+            // todo: реализовать подтверждение зарезервированного события
+
+            return RedirectToAction("UserCalendar", "Reserv");
         }
     }
 }
