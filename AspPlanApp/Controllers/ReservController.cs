@@ -15,44 +15,33 @@ namespace AspPlanApp.Controllers
 {
     public class ReservController : Controller
     {
-        private UserManager<User> _userManager;
-        private RoleManager<IdentityRole> _roleManager;
-        private AppDbContext _dbContext;
-        private IConfiguration _config;
-        private DbOrgServ _dbOrgServ;
-        private DbOrgStaffServ _dbOrgStaffServ;
+        private readonly UserManager<User> _userManager;
+        private readonly IDbOrg _dbOrg;
+        private readonly IDbOrgStaff _dbOrgStaff;
+        private readonly IDbOrgReserv _dbOrgReserv;
         
         
         public ReservController(
             UserManager<User> userManager, 
-            RoleManager<IdentityRole> roleManger,
-            AppDbContext dbContext,
-            IConfiguration config
+            IDbOrg dbOrg,
+            IDbOrgStaff dbOrgStaff,
+            IDbOrgReserv dbOrgReserv
         )
         {
             _userManager = userManager;
-            _roleManager = roleManger;
-            _dbContext = dbContext;
-            _config = config;
-
-            DbServInitialization();
+            _dbOrg = dbOrg;
+            _dbOrgStaff = dbOrgStaff;
+            _dbOrgReserv = dbOrgReserv;
         }
         
-        private void DbServInitialization()
-        {
-            if (_dbOrgServ == null)
-                _dbOrgServ = new DbOrgServ(_dbContext, _config, _userManager, _roleManager);
-            
-            if (_dbOrgStaffServ == null)
-                _dbOrgStaffServ = new DbOrgStaffServ(_dbContext, _config, _userManager, _roleManager);
-        }
 
         [HttpGet]
         public async Task<IActionResult> OrgCalendar(int OrgId, DateTime dateCal)
         {
-            if (OrgId == 0 || dateCal == DateTime.MinValue) return RedirectToAction("Index", "Home"); 
+            if (OrgId == 0 || dateCal == DateTime.MinValue) 
+                return RedirectToAction("Index", "Home"); 
             
-            Models.DbModels.Org orgInfo = await DbOrgServ.GetOrgByIdAsync(OrgId);
+            Models.DbModels.Org orgInfo = await _dbOrg.GetOrgByIdAsync(OrgId);
             string orgName = string.Empty;
             if (orgInfo != null)
             {
@@ -61,7 +50,7 @@ namespace AspPlanApp.Controllers
             
             List<StaffInfo> staffInfo = new List<StaffInfo>();
 
-            var orgStaff = await DbOrgStaffServ.GetOrgStaffByOrgId(OrgId);
+            var orgStaff = await _dbOrgStaff.GetOrgStaffByOrgId(OrgId);
             if (orgStaff.Length > 0)
             {
                 foreach (var staff in orgStaff)
@@ -84,5 +73,48 @@ namespace AspPlanApp.Controllers
             });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UserCalendar()
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+            
+            if (string.IsNullOrEmpty(userId))
+                return RedirectToAction("Login", "Account");
+            
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddNewEvent(int orgId,DateTime dateFrom,DateTime dateTo,int staff,string comm)
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+
+            if (
+                string.IsNullOrEmpty(userId) 
+                || orgId == 0 
+                || dateFrom == DateTime.MinValue 
+                || dateTo == DateTime.MinValue
+                )
+                return RedirectToAction("Login", "Account");
+
+            if (dateTo > dateFrom)
+            {
+                await _dbOrgReserv.AddNewEvent(userId, orgId, dateFrom, dateTo, staff, comm);
+            }
+                
+            return RedirectToAction("OrgCalendar", "Reserv", new { orgId, dateCal = dateFrom });
+        }
+
+        public async Task<IActionResult> ConfirmReserveEvent(int resId, string currDateString)
+        {
+            DateTime currDate = DateTime.Now;
+            DateTime.TryParse(currDateString, out currDate);
+            
+            // todo: реализовать подтверждение зарезервированного события
+
+            return RedirectToAction("UserCalendar", "Reserv");
+        }
     }
 }

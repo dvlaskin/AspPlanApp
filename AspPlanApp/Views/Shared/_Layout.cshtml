@@ -38,29 +38,7 @@
                         <!-- Nav -->
                         <div class="collapse navbar-collapse" id="planappNav">
                             <ul class="navbar-nav" id="planappMenu">
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Homes</a>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Explore <i class="fa fa-angle-down" aria-hidden="true"></i>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item" href="#">Homes</a>
-                                        <a class="dropdown-item" href="#">Explore</a>
-                                        <a class="dropdown-item" href="#">Listing</a>
-                                        <a class="dropdown-item" href="#">Single Listing</a>
-                                        <a class="dropdown-item" href="#">Contact</a>
-                                    </div>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="About">About</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
-                                </li>
-                                <!-- Signin btn -->
+                                <!-- Menu Items -->
                                 @await Html.PartialAsync("_LoginPartial")
                             </ul>
 

@@ -1,4 +1,5 @@
-﻿@model AspPlanApp.Models.ReservViewModels.OrgDateViewModel
+﻿@using Org.BouncyCastle.Asn1.Ocsp
+@model AspPlanApp.Models.ReservViewModels.OrgDateViewModel
 @{
     ViewBag.Title = "Calendar of Company";
     Layout = "_Layout";
@@ -44,31 +45,43 @@
                 </div>
                 <div class="modal-body">
                     
-                    <div>
-                        <label for="dateFrom" class="control-label">Start event time</label>
-                        <input type="datetime-local" name="dateFrom" class="form-control"/>
-                        
-                        <label for="dateTo" class="control-label">Finish event time</label>
-                        <input type="datetime-local" name="dateTo" class="form-control"/>
-                        
-                        @if (Model.staffInfo.Length > 0)
-                        {
-                            <label for="Staff" class="control-label">Staff for event</label>
-                            <select name="Staff" class="form-control">
-                                <option value="" disabled selected>Select Staff</option>
-                                @foreach (var staffItem in Model.staffInfo)
-                                {
-                                    <option value="@staffItem.orgStaffId">@staffItem.staffName</option>
-                                }
-                            </select>
-                        }
-                        
-                        <label for="comment" class="control-label">Your comment</label>
-                        <input type="text" name="comment" class="form-control"/>
-                    </div>
+                    <form id="js-event-form" asp-action="AddNewEvent" asp-controller="Reserv" >
+
+                        <div>
+                            <input name="orgId" value="@Model.orgId" type="hidden"/>
+                            
+                            <label for="dateFrom" class="control-label">Start event time</label>
+                            <input id="js-add-event-datefrom"
+                                   type="datetime-local"
+                                   name="dateFrom"
+                                   class="form-control"/>
+
+                            <label for="dateTo" class="control-label">Finish event time</label>
+                            <input id="js-add-event-dateto"
+                                   type="datetime-local"
+                                   name="dateTo"
+                                   class="form-control"/>
+
+                            @if (Model.staffInfo.Length > 0)
+                            {
+                                <label for="Staff" class="control-label">Staff for event</label>
+                                <select id="js-add-event-staff" name="Staff" class="form-control">
+                                    <option value="" disabled selected>Select Staff</option>
+                                    @foreach (var staffItem in Model.staffInfo)
+                                    {
+                                        <option value="@staffItem.orgStaffId">@staffItem.staffName</option>
+                                    }
+                                </select>
+                            }
+
+                            <label for="comment" class="control-label">Your comment</label>
+                            <input id="js-add-event-comm" type="text" name="comm" class="form-control"/>
+                        </div>
                     <br/>
-                    <button class="button-main" type="button">Save</button>
-                   
+                    <button id="js-add-event" class="button-main" type="submit">Save</button>
+                    
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -80,12 +93,32 @@
     <script src="/lib/fullcalendar/interaction/main.min.js"></script>
     <script src="/lib/fullcalendar/daygrid/main.min.js"></script>
     <script src="/lib/fullcalendar/timegrid/main.min.js"></script>
- 
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    
     <script>
         
         $(document).ready(function () {
+            
+            var userAuthorized = @User.Identity.IsAuthenticated.ToString().ToLower();
 
             GetOrgEventReserves();
+
+            $('#js-add-event').on('click', function(event) {
+
+                var res = $("#js-event-form").validate({
+                    rules: {
+                        dateFrom: { required: true },
+                        dateTo: { required: true }
+                    },
+                    messages: {
+                        dateFrom: "Input date and time!",
+                        dateTo: "Input date and time!"
+                    },
+                    focusInvalid: true,
+                    errorClass: "input_error"
+                });
+
+            });
 
             function GetOrgEventReserves () {
                 
@@ -101,7 +134,7 @@
                     },
                     success: function(data) {
                         $.each(data, function(i, v) {
-                            console.log(v);
+                            //console.log(v);
                             events.push({
                                 title: (v.isMy ? 'Your reserve ' : '') + ' Staff: ' + v.staffName,
                                 description: v.comment,
@@ -125,6 +158,8 @@
             }
             
             function GenerateCalendar(events) {
+                
+                $('#calendar').html('');
 
                 var calendarEl = document.getElementById('calendar');
 
@@ -151,7 +186,12 @@
                         addButton: {
                             text: 'Make a reservation',
                             click: function() {
-                                $('#addReserve').modal();;
+                                
+                                if (!userAuthorized) {
+                                    window.location.href = "@Url.Action("Login", "Account")";
+                                }
+                                
+                                $('#addReserve').modal();
                             }
                         }
                     },

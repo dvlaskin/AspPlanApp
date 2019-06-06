@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AspPlanApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AspPlanApp.Services.DbHelpers
 {
-    public class DbCategoryServ
+    public class DbCategory : IDbCategory
     {
-        private static AppDbContext _dbContext;
+        private readonly AppDbContext _dbContext;
         
-        
-        public DbCategoryServ(AppDbContext dbContext)
+        public DbCategory(AppDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -20,7 +17,7 @@ namespace AspPlanApp.Services.DbHelpers
         /// Get array all categories
         /// </summary>
         /// <returns></returns>
-        public static async Task<Models.DbModels.Category[]> GetCatListAsync()
+        public async Task<Models.DbModels.Category[]> GetCatListAsync()
         {
             return await _dbContext.Category.ToArrayAsync();
         }
