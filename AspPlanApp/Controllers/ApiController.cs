@@ -84,5 +84,26 @@ namespace AspPlanApp.Controllers
             
             return Json(result);
         }
+        
+        /// <summary>
+        /// Получить перечень зарезервированных событий пользователя от даты
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<JsonResult> GetUserCalendar(DateTime dateCal)
+        {
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+            
+            if (string.IsNullOrEmpty(userId))
+                return null;
+            
+            if (dateCal == DateTime.MinValue)
+                dateCal = DateTime.Now;
+
+            var viewModel = await _dbOrgReserv.GetUserCalendar(userId, dateCal);
+            
+            return Json(viewModel);
+        }
     }
 }
