@@ -187,5 +187,56 @@ namespace AspPlanApp.Services.DbHelpers
             
             return result;
         }
+
+        /// <summary>
+        /// Confirm Reserved Event
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="resId"></param>
+        /// <param name="isAdmin"></param>
+        /// <returns></returns>
+        public async Task ConfirmResEvent(string userId, int resId, bool isAdmin)
+        {
+            if (string.IsNullOrEmpty(userId) || resId == 0) return;
+
+            int resultQuery = 0;
+            
+            await Task.Run(async () =>
+            {
+                ConnectionDb conn = new ConnectionDb(_config);
+
+                using (IDbConnection sqlCon = conn.GetConnection)
+                {
+                    string query = @"
+                        select
+                            count(*) as kol
+                        from orgreserve r
+                        left join org on org.orgid = r.orgid
+                        left join orgstaff s on s.orgid = r.orgid and s.orgstaffid = r.orgstaffid
+                        where resid = 5
+                            and (ifnull(org.owner,'') = @userId
+                                or ifnull(s.staffid,'') = @userId)
+                    ";
+
+                    // Ensure that the connection state is Open
+                    ConnectionDb.OpenConnect(sqlCon);
+
+                    resultQuery = await sqlCon.ExecuteScalarAsync<int>(
+                        query, new { resid = resId, userId = userId }
+                    );
+                }
+            });
+
+            if (resultQuery != 0 || isAdmin)
+            {
+                var reserveItem = await _dbContext.OrgReserve.Where(w => w.resId == resId).FirstOrDefaultAsync();
+                if (reserveItem != null)
+                {
+                    reserveItem.isConfirm = true;
+                    _dbContext.OrgReserve.Update(reserveItem);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+        }
     }
 }

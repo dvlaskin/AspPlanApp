@@ -15,5 +15,7 @@ namespace AspPlanApp.Services.DbHelpers
         Task AddNewEvent(string userId, int orgId, DateTime dateFrom, DateTime dateTo, int staffId, string comm);
 
         Task<List<UserCalendarViewModel>> GetUserCalendar(string userId, DateTime dateCal);
+
+        Task ConfirmResEvent(string userId, int resId, bool isAdmin);
     }
 }

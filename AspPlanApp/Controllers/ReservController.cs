@@ -107,12 +107,16 @@ namespace AspPlanApp.Controllers
             return RedirectToAction("OrgCalendar", "Reserv", new { orgId, dateCal = dateFrom });
         }
 
-        public async Task<IActionResult> ConfirmReserveEvent(int resId, string currDateString)
+        [HttpPost]
+        public async Task<IActionResult> ConfirmReserveEvent(int resId)
         {
-            DateTime currDate = DateTime.Now;
-            DateTime.TryParse(currDateString, out currDate);
+            var user = User;
+            string userId = _userManager.GetUserId(user);
+
+            bool isAdmin = user.IsInRole(AppRoles.Admin);
             
             // todo: реализовать подтверждение зарезервированного события
+            await _dbOrgReserv.ConfirmResEvent(userId, resId, isAdmin);
 
             return RedirectToAction("UserCalendar", "Reserv");
         }
